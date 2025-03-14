@@ -15,6 +15,14 @@ Zhang, Wei<sup>1</sup>, Clackson, Kaili<sup>1</sup>, Georgieva, Stanimira<sup>1<
 
 This repository contains the analytical code used to investigate how adult-infant neural coupling mediates the selection of socially-relevant stimuli for learning in both British and Singaporean infant populations. The analysis focuses on neural synchrony between adults and infants during social interaction, and how this relates to learning outcomes.
 
+## Citation
+
+If you use this code in your research, please cite our paper:
+
+```
+Zhang, W., Clackson, K., Georgieva, S., Santamaria, L., Reindl, V., Noreika, V., Darby, N., Valsdottir, V., Santhanakrishnan, P., & Leong, V. (2025). Adult-Infant Neural Coupling Mediates Selection of Socially-Relevant Stimuli for Learning In British and Singaporean Infants. [Journal Name], [Volume](Issue), [Pages].
+```
+
 ## Important Note on Data Availability
 
 **This code demonstrates the analytical methodology only.** Due to data privacy requirements, all data paths, variable names, and values shown in this repository are examples only. The actual analysis was performed on protected research data.
@@ -30,15 +38,7 @@ The code in this repository requires the following major dependencies:
 
 ## Usage
 
-Please refer to the individual directories for specific usage instructions. Each directory contains a README file explaining the purpose and usage of the scripts within.
-
-## Citation
-
-If you use this code in your research, please cite our paper:
-
-```
-Zhang, W., Clackson, K., Georgieva, S., Santamaria, L., Reindl, V., Noreika, V., Darby, N., Valsdottir, V., Santhanakrishnan, P., & Leong, V. (2025). Adult-Infant Neural Coupling Mediates Selection of Socially-Relevant Stimuli for Learning In British and Singaporean Infants. [Journal Name], [Volume](Issue), [Pages].
-```
+Please refer to the codes for specific usage instructions. Each code file contains a summary explaining the purpose and usage of the scripts.
 
 ## Acknowledgements
 
@@ -50,7 +50,13 @@ Thanks also to Melis Çetinçelik, Marina Wenzl, Winnie Wee, Ivfy Foong, Teo Kai
 
 ## License
 
-[Specify the license under which this code is released]
+MIT License
+
+Copyright (c) 2025 Zhang et al.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files, to deal in the Software without restriction, including the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 ## Contact
 
@@ -64,4 +70,4 @@ Email: victorialeong@ntu.edu.sg
 or first author: Dr. Wei Zhang
 Early Mental Potential and Wellbeing Research (EMPOWER) Centre,  
 Nanyang Technological University, Singapore  
-Email: wilson.zhangwei@ntu.edu.sg
+Email: wilson.zhangwei@ntu.edu.sg 
