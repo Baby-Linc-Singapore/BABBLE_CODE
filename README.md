@@ -63,11 +63,13 @@ The above copyright notice and this permission notice shall be included in all c
 For any questions regarding this code repository, please contact:
 
 PI: Prof. Victoria Leong  
+
 Early Mental Potential and Wellbeing Research (EMPOWER) Centre,  
 Nanyang Technological University, Singapore  
 Email: victorialeong@ntu.edu.sg
 
 or the author: Dr. Wei Zhang
+
 Early Mental Potential and Wellbeing Research (EMPOWER) Centre,  
 Nanyang Technological University, Singapore  
 Email: wilson.zhangwei@ntu.edu.sg 
