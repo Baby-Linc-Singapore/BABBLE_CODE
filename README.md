@@ -50,6 +50,8 @@ Special thanks to Eszter and Diarmid Campbell for invaluable practical advice on
 
 Thanks also to Melis Çetinçelik, Marina Wenzl, Winnie Wee, Ivfy Foong, Teo Kai Xin, Dorcas Keow, Yvonne Chia, Jamie Lee, Sim Jia Yi, Lois Timothy, Arya Bhomick, Nastassja Fischer, Lee Kean Mun for assistance with data collection and analysis.
 
+We thank and acknowledge the Cognitive Neuroimaging Centre, Nanyang Technological University, Singapore for computational resources used in data analysis.
+
 ## License
 
 MIT License
