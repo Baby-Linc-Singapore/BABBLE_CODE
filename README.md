@@ -4,12 +4,14 @@ This repository contains the analysis code for the research paper:
 
 **Adult-Infant Neural Coupling Mediates Selection of Socially-Relevant Stimuli for Learning In British and Singaporean Infants**
 
-Zhang, Wei<sup>1</sup>, Clackson, Kaili<sup>1</sup>, Georgieva, Stanimira<sup>1</sup>, Santamaria, Lorena<sup>1</sup>, Reindl, Vanessa<sup>2</sup>, Noreika, Valdas<sup>3</sup>, Darby, Nicholas<sup>4</sup>, Valsdottir, Vaka<sup>4</sup>, Santhanakrishnan, Priyadharshini<sup>1</sup>, & Leong, Victoria<sup>1</sup>
+Zhang, Wei<sup>1,2</sup>, Clackson, Kaili<sup>1</sup>, Georgieva, Stanimira<sup>1</sup>, Santamaria, Lorena<sup>1</sup>, Reindl, Vanessa<sup>3,4</sup>, Noreika, Valdas<sup>5</sup>, Darby, Nicholas<sup>6</sup>, Valsdottir, Vaka<sup>6</sup>, Santhanakrishnan, Priyadharshini<sup>1</sup>, & Leong, Victoria<sup>1</sup>
 
-<sup>1</sup> Early Mental Potential and Wellbeing Research (EMPOWER) Centre, Nanyang Technological University, Singapore  
-<sup>2</sup> Division of Psychology, Nanyang Technological University, Singapore  
-<sup>3</sup> Department of Biological and Experimental Psychology, School of Biological and Chemical Sciences, Queen Mary University of London, London, UK  
-<sup>4</sup> Department of Psychology, University of Cambridge, UK
+<sup>1</sup> Early Mental Potential and Wellbeing Research (EMPOWER) Centre, Nanyang Technological University, Singapore
+<sup>2</sup> Cognitive Neuroimaging Centre, Nanyang Technological University, Singapore
+<sup>3</sup> Division of Psychology, Nanyang Technological University, Singapore
+<sup>4</sup> Section Child Neuropsychology, Department of Child and Adolescent Psychiatry, Psychosomatics and Psychotherapy, Uniklinik RWTH Aachen, Germany
+<sup>5</sup> Department of Psychology, School of Biological and Chemical Sciences, Queen Mary University of London, London, UK
+<sup>6</sup> Department of Psychology, University of Cambridge, UK
 
 ## Overview
 
