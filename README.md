@@ -2,7 +2,7 @@
 
 This repository contains the analysis code for the research paper:
 
-**Adult-Infant Neural Coupling Mediates Selection of Socially-Relevant Stimuli for Learning In British and Singaporean Infants**
+**Adult-infant neural coupling mediates infants’ selection of socially-relevant stimuli for learning across cultures**
 
 Zhang, Wei<sup>1,2</sup>, Clackson, Kaili<sup>1</sup>, Georgieva, Stanimira<sup>1</sup>, Santamaria, Lorena<sup>1</sup>, Reindl, Vanessa<sup>3,4</sup>, Noreika, Valdas<sup>5</sup>, Darby, Nicholas<sup>6</sup>, Valsdottir, Vaka<sup>6</sup>, Santhanakrishnan, Priyadharshini<sup>1</sup>, & Leong, Victoria<sup>1</sup>
 
@@ -22,7 +22,7 @@ This repository contains the analytical code used to investigate how adult-infan
 If you use this code in your research, please cite our paper:
 
 ```
-Zhang, W., Clackson, K., Georgieva, S., Santamaria, L., Reindl, V., Noreika, V., Darby, N., Valsdottir, V., Santhanakrishnan, P., & Leong, V. (2025). Adult-Infant Neural Coupling Mediates Selection of Socially-Relevant Stimuli for Learning In British and Singaporean Infants. [Journal Name], [Volume](Issue), [Pages].
+Zhang, W., Clackson, K., Georgieva, S., Santamaria, L., Reindl, V., Noreika, V., Darby, N., Valsdottir, V., Santhanakrishnan, P., & Leong, V. (2025). Adult-infant neural coupling mediates infants’ selection of socially-relevant stimuli for learning across cultures.
 ```
 
 ## Important Note on Data Availability
