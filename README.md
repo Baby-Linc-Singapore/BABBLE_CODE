@@ -58,13 +58,19 @@ We thank and acknowledge the Cognitive Neuroimaging Centre, Nanyang Technologica
 
 ## License
 
-MIT License
+Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)
 
 Copyright (c) 2025 Zhang et al.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files, to deal in the Software without restriction, including the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files, to deal in the material without restriction, including the rights to use, copy, modify, remix, transform, and build upon the material, provided that:
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+Attribution — You must give appropriate credit, provide a link to the license, and indicate if changes were made.
+
+NonCommercial — You may not use the material for commercial purposes.
+
+No additional restrictions — You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
+
+The full license text is available at: https://creativecommons.org/licenses/by-nc/4.0/
 
 ## Contact
 
