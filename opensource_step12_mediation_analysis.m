@@ -1,10 +1,18 @@
 %% Mediation Analysis of Gaze, Neural Connectivity, and Learning
-% This code demonstrates the analytical methodology for examining how gaze conditions 
-% affect infant learning through neural mechanisms using mediation analysis with bootstrapping.
 % All datasets have been made publicly available through Nanyang Technological University (NTU)'s 
-% data repository (DR-NTU Data https://researchdata.ntu.edu.sg/) and can be accessed according to NTU's open access policy.
+% data repository (DR-NTU Data https://researchdata.ntu.edu.sg/) and can be accessed according to 
+% NTU's open access policy.
+%
+% Purpose: Analyze the relationship between different types of neural connectivity 
+% (adult-infant and infant-infant) and learning outcomes in infants using PLS regression
+%
+% This script performs mediation analysis to:
+% 1. Test if neural synchrony measures mediate the relationship between gaze condition and learning
+% 2. Test if adult-infant connectivity mediates the relationship between gaze condition and learning
+% 3. Compare the direct and indirect effects through bootstrap confidence intervals
 
-clear all; clc;
+clear all;
+clc;
 
 %% Load and prepare data
 
