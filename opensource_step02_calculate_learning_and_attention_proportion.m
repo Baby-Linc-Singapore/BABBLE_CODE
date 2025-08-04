@@ -1,11 +1,9 @@
 %% Learning and Attention Analysis Script
 % NOTE: This code demonstrates the analytical methodology only. Due to data privacy requirements,
 % all data paths, variable names, and values shown here are examples only.
-% The actual analysis was performed on protected research data. Data are protected and are not 
-% available due to data privacy regulations. Access to anonymized data collected can be requested 
-% by contacting the corresponding author (Prof. Victoria Leong, VictoriaLeong@ntu.edu.sg) and 
-% is subject to the establishment of a specific data sharing agreement between the applicant's 
-% institution and the institutions of data collection.
+% All datasets have been made publicly available through Nanyang Technological University (NTU)'s 
+% data repository (DR-NTU Data https://researchdata.ntu.edu.sg/) and can be accessed according to 
+% NTU's open access policy.
 %
 % Purpose: Calculate learning scores and attention metrics from raw behavioral data
 %
@@ -28,6 +26,8 @@ SD_cutoff = 2.5;  % Number of standard deviations for outlier detection
 
 %% Process data from Location 1 (learning scores)
 
+fprintf('Processing Location 1 learning data...\n');
+
 % Load raw looking time data
 try
     data_location1 = textread(fullfile(base_path, 'looktime/Location1_AllData.txt'));
@@ -39,7 +39,10 @@ end
 participants_location1 = unique(data_location1(:,1));
 participants_location1_ID = unique(data_location1(:,1)) + 1000;
 
-% Note: Any participants that don't meet inclusion criteria would be excluded here
+% Remove excluded participants (IDs 12 and 31 based on fs1 code)
+exclude_idx = [12, 31];
+participants_location1(exclude_idx) = [];
+participants_location1_ID(exclude_idx) = [];
 
 % Initialize counters for data cleaning statistics
 total_trials = 0;
@@ -60,54 +63,56 @@ for p = 1:length(participants_location1_ID)
     % Find valid trials (non-zero looking times)
     valid_trials = find(data_location1(:,1) == participants_location1(p) & data_location1(:,9) > 0);
     
-    % Extract demographic information
-    age_location1(p) = data_location1(valid_trials(1), 2);
-    sex_location1(p) = data_location1(valid_trials(1), 3);
-    
-    % Extract trial information
-    % Columns: 6=condition, 8=word, 9=looking time, 10=error flag, 5=block
-    trial_data = [data_location1(valid_trials, 6), data_location1(valid_trials, 8), ...
-                 data_location1(valid_trials, 9), data_location1(valid_trials, 10), ... 
-                 data_location1(valid_trials, 5)];
-    
-    % Calculate individual outlier threshold
-    outlier_threshold = mean(trial_data(:,3)) + SD_cutoff * std(trial_data(:,3));
-    
-    % Process each block
-    for block = 1:3
-        % Find trials within outlier threshold for this block
-        valid_block_trials = find(trial_data(:,3) < outlier_threshold & trial_data(:,5) == block);
+    if ~isempty(valid_trials)
+        % Extract demographic information
+        age_location1(p) = data_location1(valid_trials(1), 2);
+        sex_location1(p) = data_location1(valid_trials(1), 3);
         
-        % Check if there are enough valid trials and both words are represented
-        if length(valid_block_trials) > 1 && length(unique(trial_data(valid_block_trials, 2))) == 2
-            % Process each condition
-            for cond = 1:3
-                % Process each word
-                for word = 1:2
-                    % Find valid trials for this condition, word, and block
-                    valid_trials_subset = find(trial_data(:,1) == cond & trial_data(:,2) == word & ...
-                                              trial_data(:,3) < outlier_threshold & trial_data(:,5) == block);
-                    
-                    % Count all trials for this condition, word, and block (including outliers)
-                    all_trials_subset = find(trial_data(:,1) == cond & trial_data(:,2) == word & trial_data(:,5) == block);
-                    
-                    % Calculate mean looking time if valid trials exist
-                    if ~isempty(valid_trials_subset)
-                        MeanLook_location1{cond}(p, word, block) = nanmean(trial_data(valid_trials_subset, 3));
+        % Extract trial information
+        % Columns: 6=condition, 8=word, 9=looking time, 10=error flag, 5=block
+        trial_data = [data_location1(valid_trials, 6), data_location1(valid_trials, 8), ...
+                     data_location1(valid_trials, 9), data_location1(valid_trials, 10), ... 
+                     data_location1(valid_trials, 5)];
+        
+        % Calculate individual outlier threshold
+        outlier_threshold = mean(trial_data(:,3)) + SD_cutoff * std(trial_data(:,3));
+        
+        % Process each block
+        for block = 1:3
+            % Find trials within outlier threshold for this block
+            valid_block_trials = find(trial_data(:,3) < outlier_threshold & trial_data(:,5) == block);
+            
+            % Check if there are enough valid trials and both words are represented
+            if length(valid_block_trials) > 1 && length(unique(trial_data(valid_block_trials, 2))) == 2
+                % Process each condition
+                for cond = 1:3
+                    % Process each word
+                    for word = 1:2
+                        % Find valid trials for this condition, word, and block
+                        valid_trials_subset = find(trial_data(:,1) == cond & trial_data(:,2) == word & ...
+                                                  trial_data(:,3) < outlier_threshold & trial_data(:,5) == block);
                         
-                        % Update counters for data cleaning statistics
-                        clean_trials = clean_trials + length(valid_trials_subset);
-                        total_trials = total_trials + length(all_trials_subset);
-                    else
-                        MeanLook_location1{cond}(p, word, block) = NaN;
+                        % Count all trials for this condition, word, and block (including outliers)
+                        all_trials_subset = find(trial_data(:,1) == cond & trial_data(:,2) == word & trial_data(:,5) == block);
+                        
+                        % Calculate mean looking time if valid trials exist
+                        if ~isempty(valid_trials_subset)
+                            MeanLook_location1{cond}(p, word, block) = nanmean(trial_data(valid_trials_subset, 3));
+                            
+                            % Update counters for data cleaning statistics
+                            clean_trials = clean_trials + length(valid_trials_subset);
+                            total_trials = total_trials + length(all_trials_subset);
+                        else
+                            MeanLook_location1{cond}(p, word, block) = NaN;
+                        end
                     end
                 end
-            end
-        else
-            % Not enough valid trials or missing word data
-            for cond = 1:3
-                for word = 1:2
-                    MeanLook_location1{cond}(p, word, block) = NaN;
+            else
+                % Not enough valid trials or missing word data
+                for cond = 1:3
+                    for word = 1:2
+                        MeanLook_location1{cond}(p, word, block) = NaN;
+                    end
                 end
             end
         end
@@ -115,6 +120,8 @@ for p = 1:length(participants_location1_ID)
 end
 
 %% Process data from Location 2 (learning scores)
+
+fprintf('Processing Location 2 learning data...\n');
 
 % Load raw looking time data
 data_location2 = textread(fullfile(base_path, 'looktime/Location2_AllData.txt'));
@@ -138,53 +145,55 @@ for p = 1:length(participants_location2_ID)
     % Find valid trials (non-zero looking times)
     valid_trials = find(data_location2(:,1) == participants_location2(p) & data_location2(:,9) > 0);
     
-    % Extract demographic information
-    age_location2(p) = data_location2(valid_trials(1), 2);
-    sex_location2(p) = data_location2(valid_trials(1), 3);
-    
-    % Extract trial information
-    trial_data = [data_location2(valid_trials, 6), data_location2(valid_trials, 8), ...
-                 data_location2(valid_trials, 9), data_location2(valid_trials, 10), ... 
-                 data_location2(valid_trials, 5)];
-    
-    % Calculate individual outlier threshold
-    outlier_threshold = mean(trial_data(:,3)) + SD_cutoff * std(trial_data(:,3));
-    
-    % Process each block
-    for block = 1:3
-        % Find trials within outlier threshold for this block
-        valid_block_trials = find(trial_data(:,3) < outlier_threshold & trial_data(:,5) == block);
+    if ~isempty(valid_trials)
+        % Extract demographic information
+        age_location2(p) = data_location2(valid_trials(1), 2);
+        sex_location2(p) = data_location2(valid_trials(1), 3);
         
-        % Check if there are enough valid trials and both words are represented
-        if length(valid_block_trials) > 1 && length(unique(trial_data(valid_block_trials, 2))) == 2
-            % Process each condition
-            for cond = 1:3
-                % Process each word
-                for word = 1:2
-                    % Find valid trials for this condition, word, and block
-                    valid_trials_subset = find(trial_data(:,1) == cond & trial_data(:,2) == word & ...
-                                              trial_data(:,3) < outlier_threshold & trial_data(:,5) == block);
-                    
-                    % Count all trials for this condition, word, and block (including outliers)
-                    all_trials_subset = find(trial_data(:,1) == cond & trial_data(:,2) == word & trial_data(:,5) == block);
-                    
-                    % Calculate mean looking time if valid trials exist
-                    if ~isempty(valid_trials_subset)
-                        MeanLook_location2{cond}(p, word, block) = nanmean(trial_data(valid_trials_subset, 3));
+        % Extract trial information
+        trial_data = [data_location2(valid_trials, 6), data_location2(valid_trials, 8), ...
+                     data_location2(valid_trials, 9), data_location2(valid_trials, 10), ... 
+                     data_location2(valid_trials, 5)];
+        
+        % Calculate individual outlier threshold
+        outlier_threshold = mean(trial_data(:,3)) + SD_cutoff * std(trial_data(:,3));
+        
+        % Process each block
+        for block = 1:3
+            % Find trials within outlier threshold for this block
+            valid_block_trials = find(trial_data(:,3) < outlier_threshold & trial_data(:,5) == block);
+            
+            % Check if there are enough valid trials and both words are represented
+            if length(valid_block_trials) > 1 && length(unique(trial_data(valid_block_trials, 2))) == 2
+                % Process each condition
+                for cond = 1:3
+                    % Process each word
+                    for word = 1:2
+                        % Find valid trials for this condition, word, and block
+                        valid_trials_subset = find(trial_data(:,1) == cond & trial_data(:,2) == word & ...
+                                                  trial_data(:,3) < outlier_threshold & trial_data(:,5) == block);
                         
-                        % Update counters for data cleaning statistics
-                        clean_trials = clean_trials + length(valid_trials_subset);
-                        total_trials = total_trials + length(all_trials_subset);
-                    else
-                        MeanLook_location2{cond}(p, word, block) = NaN;
+                        % Count all trials for this condition, word, and block (including outliers)
+                        all_trials_subset = find(trial_data(:,1) == cond & trial_data(:,2) == word & trial_data(:,5) == block);
+                        
+                        % Calculate mean looking time if valid trials exist
+                        if ~isempty(valid_trials_subset)
+                            MeanLook_location2{cond}(p, word, block) = nanmean(trial_data(valid_trials_subset, 3));
+                            
+                            % Update counters for data cleaning statistics
+                            clean_trials = clean_trials + length(valid_trials_subset);
+                            total_trials = total_trials + length(all_trials_subset);
+                        else
+                            MeanLook_location2{cond}(p, word, block) = NaN;
+                        end
                     end
                 end
-            end
-        else
-            % Not enough valid trials or missing word data
-            for cond = 1:3
-                for word = 1:2
-                    MeanLook_location2{cond}(p, word, block) = NaN;
+            else
+                % Not enough valid trials or missing word data
+                for cond = 1:3
+                    for word = 1:2
+                        MeanLook_location2{cond}(p, word, block) = NaN;
+                    end
                 end
             end
         end
@@ -196,6 +205,8 @@ fprintf('Data cleaning ratio: %.2f%% (retained %d of %d trials)\n', ...
         100 * clean_trials / total_trials, clean_trials, total_trials);
 
 %% Combine learning scores and calculate learning difference (word2 - word1)
+
+fprintf('Combining learning data from both locations...\n');
 
 % Initialize the combined data array
 combined_data = [];
@@ -233,13 +244,22 @@ end
 
 %% Process attention data from Location 1
 
+fprintf('Processing Location 1 attention data...\n');
+
 % Load attention data
 attention_data_location1 = xlsread(fullfile(base_path, 'looktime/Location1_Summary.xlsx'));
 
-% List of participant IDs
-location1_list = [101, 102, 103, 104, 105, 106, 107, 108, 109, 111, 112, 113, 114, ...
-                 116, 117, 118, 119, 121, 122, 123, 124, 125, 126, 127, 128, 129, ...
-                 131, 132, 133, 135, 136];
+% Handle potential ID adjustment (as seen in fs1 code)
+if any(attention_data_location1(:,1) > 200)
+    attention_data_location1(attention_data_location1(:,1) > 200, 1) = ...
+        attention_data_location1(attention_data_location1(:,1) > 200, 1) - 100;
+end
+
+% Special case: adjust ID 6 to 101 as seen in fs1 code
+attention_data_location1(attention_data_location1(:,1) == 6, 1) = 101;
+
+% List of participant IDs (based on fs1 code)
+location1_list = participants_location1;
 
 % Initialize attention array
 attention_scores = NaN(length(location1_list), 3, 3);  % participants × blocks × conditions
@@ -262,13 +282,13 @@ for block = 1:3
 end
 
 % Adjust IDs to match the combined data format
-location1_list = location1_list + 1000;
+location1_list_adjusted = location1_list + 1000;
 
 % Add attention scores to Location 1 data in the combined dataset
 for i = 1:size(combined_data, 1)
     if combined_data(i, 1) == 1  % Location 1
         % Find the participant index
-        participant_idx = find(location1_list == combined_data(i, 2));
+        participant_idx = find(location1_list_adjusted == combined_data(i, 2));
         
         if ~isempty(participant_idx)
             block = combined_data(i, 5);
@@ -285,11 +305,16 @@ end
 
 %% Process attention data from Location 2
 
+fprintf('Processing Location 2 attention data...\n');
+
 % Load attention data
 attention_data_location2 = xlsread(fullfile(base_path, 'looktime/Location2_Summary.xlsx'));
 
-% Ensure participant IDs are consistent with the main dataset format
-% Preprocessing steps would be applied here if needed
+% ID adjustment for Location 2 (if needed)
+if any(attention_data_location2(:,1) > 200)
+    attention_data_location2(attention_data_location2(:,1) > 200, 1) = ...
+        attention_data_location2(attention_data_location2(:,1) > 200, 1) - 100;
+end
 
 % Find unique combinations of participant, block, and condition
 [group_combinations, ~, group_ids] = unique(attention_data_location2(:, [1, 7, 9]), 'rows', 'stable');
@@ -332,7 +357,9 @@ for i = 1:size(combined_data, 1)
         
         if ~isempty(matching_row)
             % Calculate and add attention proportion
-            combined_data(i, 9) = group_data(matching_row, 5) / group_data(matching_row, 4);
+            if group_data(matching_row, 4) > 0
+                combined_data(i, 9) = group_data(matching_row, 5) / group_data(matching_row, 4);
+            end
         end
     end
 end
@@ -375,6 +402,8 @@ fprintf('Participants with complete attention data: %d\n', length(unique(attenti
 
 %% Export combined data to Excel
 
+fprintf('Exporting data to Excel...\n');
+
 % Define column headers
 column_headers = {'location', 'id', 'age', 'sex', 'block', 'condition', ...
                  'learning_score', 'total_looking_time', 'attention_proportion'};
@@ -405,6 +434,8 @@ end
 
 %% Summary statistics
 
+fprintf('\nCalculating summary statistics...\n');
+
 % Calculate overall means
 mean_learning = nanmean(combined_data(:, 7));
 mean_attention = nanmean(combined_data(:, 9));
@@ -424,3 +455,15 @@ fprintf('Location 1 mean learning: %.4f\n', location1_learning);
 fprintf('Location 2 mean learning: %.4f\n', location2_learning);
 fprintf('Location 1 mean attention: %.4f\n', location1_attention);
 fprintf('Location 2 mean attention: %.4f\n', location2_attention);
+
+% Calculate means by condition
+c1 = combined_data(:, 6) == 1;  % Full gaze condition
+c2 = combined_data(:, 6) == 2;  % Partial gaze condition  
+c3 = combined_data(:, 6) == 3;  % No gaze condition
+
+fprintf('\nBy Condition:\n');
+fprintf('Full gaze learning: %.4f (n=%d)\n', nanmean(combined_data(c1, 7)), sum(~isnan(combined_data(c1, 7))));
+fprintf('Partial gaze learning: %.4f (n=%d)\n', nanmean(combined_data(c2, 7)), sum(~isnan(combined_data(c2, 7))));
+fprintf('No gaze learning: %.4f (n=%d)\n', nanmean(combined_data(c3, 7)), sum(~isnan(combined_data(c3, 7))));
+
+fprintf('\nProcessing complete.\n');
