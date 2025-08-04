@@ -38,9 +38,9 @@ All datasets have been made publicly available through Nanyang Technological Uni
 ## Requirements
 
 The code in this repository requires the following major dependencies:
-- MATLAB
-- EEGLAB toolbox
-- eMVAR toolbox
+- MATLAB R2024b (https://www.mathworks.com)
+- EEGLAB 2021.1 (https://eeglab.org/)
+- eMVAR (http://www.lucafaes.net/emvar.html)
 
 ## Usage
 
