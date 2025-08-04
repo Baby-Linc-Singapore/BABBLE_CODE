@@ -1,11 +1,7 @@
 %% Statistical Analysis for EEG Connectivity
-% NOTE: This code demonstrates the analytical methodology only. Due to data privacy requirements,
-% all data paths, variable names, and values shown here are examples only.
-% The actual analysis was performed on protected research data. Data are protected and are not 
-% available due to data privacy regulations. Access to anonymized data collected can be requested 
-% by contacting the corresponding author (Prof. Victoria Leong, VictoriaLeong@ntu.edu.sg) and 
-% is subject to the establishment of a specific data sharing agreement between the applicant's 
-% institution and the institutions of data collection.
+% All datasets have been made publicly available through Nanyang Technological University (NTU)'s 
+% data repository (DR-NTU Data https://researchdata.ntu.edu.sg/) and can be accessed according to 
+% NTU's open access policy.
 %
 % Purpose: Perform statistical analyses to identify significant connectivity patterns
 % in EEG data compared to surrogate data, and examine effects of experimental conditions
@@ -18,12 +14,12 @@
 % 5. Creates visualizations for significant connectivity patterns
 
 %% Initialize environment
-clc
-clear all
+clc;
+clear all;
 
 % Set base path and load data
 base_path = '/path/to/data/';
-connectivity_type = 'PDC';  % PDC or GPDC
+connectivity_type = 'GPDC';  % PDC or GPDC
 
 % Load real and surrogate data
 load(fullfile(base_path, ['data_read_surr_', connectivity_type, '2.mat']), 'data_surr', 'data');
@@ -69,7 +65,8 @@ for conn = 1:length(connectionTypes)
 end
 
 % Combine all titles
-titles = {'Country', 'ID', 'Age', 'Sex', 'Block', 'Condition', 'Learning', 'LEARN', 'Attention', connectionTitles{:}};
+titles = {'Country', 'ID', 'Age', 'Sex', 'Block', 'Condition', 'Learning', ...
+         'Attention', connectionTitles{:}};
 
 % Define indices for connectivity matrices
 % Each matrix has 81 elements (9x9 grid)
@@ -200,7 +197,7 @@ save(save_path, 'stronglist', 's1', 's2', 's3', 's4');
 %% Visualize connectivity strength vs. surrogate distribution
 
 % Set up figure parameters
-titles_plot = {'II PDC', 'AA PDC', 'AI PDC', 'IA PDC'};
+titles_plot = {'II GPDC', 'AA GPDC', 'AI GPDC', 'IA GPDC'};
 colorlist = {[252/255, 140/255, 90/255], ...
             [226/255, 90/255, 80/255], ...
             [75/255, 116/255, 178/255], ...
@@ -341,7 +338,7 @@ p_bonf = 0.05 / length(stronglist);  % Bonferroni corrected p-value
 t_threshold = tinv(1 - p_bonf/2, df);
 
 fprintf('\nBonferroni threshold: t(%.0f) = %.4f (p = %.6f)\n', df, t_threshold, p_bonf);
-fprintf('Top 5 t-values:\n');
+fprintf('Top 5 t-values: ');
 [sorted_t, idx] = sort(abs(tValueCondition), 'descend');
 for i = 1:min(5, length(sorted_t))
     fprintf('%.4f ', sorted_t(i));
@@ -350,38 +347,41 @@ fprintf('\n');
 
 %% Examine specific connection of interest (example)
 % Analyze the 12th connection as an example (could be any specific connection of interest)
-connection_idx = 12;
-
-% Extract data for this connection
-Y = data(:, connection_idx);
-
-% Create table for linear mixed-effects model
-tbl = table(ID, zscore(learning), zscore(atten), zscore(AGE), SEX, COUNTRY, ...
-           zscore(Y), blocks, CONDGROUP, 'VariableNames', ...
-           {'ID', 'learning', 'atten', 'AGE', 'SEX', 'COUNTRY', 'Y', 'block', 'CONDGROUP'});
-
-% Fit linear mixed-effects model
-lme = fitlme(tbl, 'Y ~ AGE + SEX + CONDGROUP + COUNTRY + (1|ID)');
-
-% Display results
-fprintf('\nAnalysis of specific connection of interest (%s):\n', titles{connection_idx});
-disp(lme.Coefficients);
-
-% Visualize this connection by condition
-figure('Position', [100, 100, 800, 600]);
-boxplot(Y, CONDGROUP, 'Labels', {'Full Gaze', 'Partial/No Gaze'});
-hold on;
-plot(ones(length(g1), 1) + 0.1*randn(length(g1), 1), Y(g1), 'r.', 'MarkerSize', 15);
-plot(2*ones(length(g2), 1) + 0.1*randn(length(g2), 1), Y(g2), 'b.', 'MarkerSize', 15);
-hold off;
-ylabel('Connectivity Strength', 'FontSize', 14, 'FontWeight', 'bold');
-title(['Effect of Gaze Condition on ', titles{connection_idx}], 'FontSize', 16, 'FontWeight', 'bold');
-ax = gca;
-ax.LineWidth = 2;
-ax.FontSize = 14;
-ax.FontWeight = 'bold';
-
-% Save figure
-saveas(gcf, fullfile(base_path, 'figures', [lower(connectivity_type), '_connection_', num2str(connection_idx), '.png']));
+if length(stronglist) >= 12
+    connection_idx = 12;
+    
+    % Extract data for this connection
+    Y = data(:, connection_idx);
+    
+    % Create table for linear mixed-effects model
+    tbl = table(ID, zscore(learning), zscore(atten), zscore(AGE), SEX, COUNTRY, ...
+               zscore(Y), blocks, CONDGROUP, 'VariableNames', ...
+               {'ID', 'learning', 'atten', 'AGE', 'SEX', 'COUNTRY', 'Y', 'block', 'CONDGROUP'});
+    
+    % Fit linear mixed-effects model
+    lme = fitlme(tbl, 'Y ~ AGE + SEX + CONDGROUP + COUNTRY + (1|ID)');
+    
+    % Display results
+    fprintf('\nAnalysis of specific connection of interest (%s):\n', titles{connection_idx});
+    disp(lme.Coefficients);
+    
+    % Visualize this connection by condition
+    figure('Position', [100, 100, 800, 600]);
+    boxplot(Y, CONDGROUP, 'Labels', {'Full Gaze', 'Partial Gaze', 'No Gaze'});
+    hold on;
+    plot(ones(length(g1), 1) + 0.1*randn(length(g1), 1), Y(g1), 'r.', 'MarkerSize', 15);
+    plot(2*ones(length(g2), 1) + 0.1*randn(length(g2), 1), Y(g2), 'b.', 'MarkerSize', 15);
+    plot(3*ones(length(g3), 1) + 0.1*randn(length(g3), 1), Y(g3), 'g.', 'MarkerSize', 15);
+    hold off;
+    ylabel('Connectivity Strength', 'FontSize', 14, 'FontWeight', 'bold');
+    title(['Effect of Gaze Condition on ', titles{connection_idx}], 'FontSize', 16, 'FontWeight', 'bold');
+    ax = gca;
+    ax.LineWidth = 2;
+    ax.FontSize = 14;
+    ax.FontWeight = 'bold';
+    
+    % Save figure
+    saveas(gcf, fullfile(base_path, 'figures', [lower(connectivity_type), '_connection_', num2str(connection_idx), '.png']));
+end
 
 fprintf('\nAnalysis complete.\n');
