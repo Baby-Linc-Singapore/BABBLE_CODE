@@ -27,7 +27,7 @@ Zhang, W., Clackson, K., Georgieva, S., Santamaria, L., Reindl, V., Noreika, V.,
 
 ## Important Note on Data Availability
 
-**This code demonstrates the analytical methodology only.** Due to data privacy requirements, all data paths, variable names, and values shown in this repository are pseudo data as examples only. The actual analysis was performed on protected research data.
+**This code repository demonstrates the analytical methodology only.** Due to data privacy requirements, all data paths, variable names, and values shown in this repository are pseudo data as examples only. The actual analysis was performed on protected research data.
 
 All datasets have been made publicly available through Nanyang Technological University (NTU)'s data repository (DR-NTU Data https://researchdata.ntu.edu.sg/) and can be accessed according to NTU's open access policy. We provide separate downloads for:
 1. Raw EEG data (https://doi.org/10.21979/N9/BQLIB9)
