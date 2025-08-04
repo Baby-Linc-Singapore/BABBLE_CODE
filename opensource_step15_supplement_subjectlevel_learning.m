@@ -1,15 +1,10 @@
 %% Subject-Level Analysis of Learning Patterns Across Gaze Conditions
+% All datasets have been made publicly available through Nanyang Technological University (NTU)'s 
+% data repository (DR-NTU Data https://researchdata.ntu.edu.sg/) and can be accessed according to 
+% NTU's open access policy.
+%
 % Purpose: Analyze how infants' learning performance varies across different gaze conditions
 %          and identify distinct learning patterns at the subject level
-%
-% NOTE: This code demonstrates the analytical methodology only. Due to data privacy requirements,
-% all data paths, variable names, and values shown here are examples only.
-% The actual analysis was performed on protected research data. Data are protected and are not
-% available due to data privacy regulations. Access to anonymized data collected can be requested
-% by contacting the corresponding author (Prof. Victoria Leong, VictoriaLeong@ntu.edu.sg) and
-% is subject to the establishment of a specific data sharing agreement between the applicant's
-% institution and the institutions of data collection.
-%
 % This script performs:
 % 1. Subject-level aggregation of learning data across conditions
 % 2. Classification of subjects into learning pattern groups
