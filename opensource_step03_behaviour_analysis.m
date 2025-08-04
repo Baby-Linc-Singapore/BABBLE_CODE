@@ -1,11 +1,9 @@
 %% Statistical Analysis Script for CDI and Learning Outcomes
 % NOTE: This code demonstrates the analytical methodology only. Due to data privacy requirements,
 % all data paths, variable names, and values shown here are examples only.
-% The actual analysis was performed on protected research data. Data are protected and are not 
-% available due to data privacy regulations. Access to anonymized data collected can be requested 
-% by contacting the corresponding author (Prof. Victoria Leong, VictoriaLeong@ntu.edu.sg) and 
-% is subject to the establishment of a specific data sharing agreement between the applicant's 
-% institution and the institutions of data collection.
+% All datasets have been made publicly available through Nanyang Technological University (NTU)'s 
+% data repository (DR-NTU Data https://researchdata.ntu.edu.sg/) and can be accessed according to 
+% NTU's open access policy.
 %
 % Purpose: Analyze relationships between language learning outcomes, gaze conditions, 
 % attentional measures, and CDI gesture scores
@@ -16,26 +14,36 @@
 % 3. Conducts statistical analyses (t-tests, linear mixed models)
 % 4. Produces statistical outputs for tables and figures
 
-%% Load and prepare data
+%% Initialize environment
+clear all
+clc
 
-% Set base path
+% Set base path (modify as needed)
 base_path = '/path/to/data/';
 
-% Load CDI (Communicative Development Inventory) data
-cdi_data = xlsread(fullfile(base_path, 'CDI', 'CDI_data.xlsx'), 'Sheet1');
-cdi_details = xlsread(fullfile(base_path, 'CDI', 'CDI_data.xlsx'), 'cdi');
+%% Load CDI (Communicative Development Inventory) data
+
+fprintf('Loading CDI data...\n');
+
+% Load CDI data and details
+cdi_data = xlsread(fullfile(base_path, 'CDI', 'CDI_questionnaire_data.xlsx'), 'Sheet1');
+cdi_details = xlsread(fullfile(base_path, 'CDI', 'CDI_questionnaire_data.xlsx'), 'cdi');
 
 % Map CDI scores to participant IDs
 for i = 1:size(cdi_data, 1)
     id = cdi_data(i, 2);
     for j = 1:size(cdi_details, 1)
         if id == cdi_details(j, 1)
-            % Extract CDI Gesture score
+            % Extract CDI scores:  Gestures (G)
             cdi_data(i, 12) = cdi_details(j, 4);
             break
         end
     end
 end
+
+%% Load behavioral data
+
+fprintf('Loading behavioral data...\n');
 
 % Load behavioral data
 behavioral_data = xlsread(fullfile(base_path, 'table', 'behavioral_data.xlsx'));
@@ -44,10 +52,11 @@ behavioral_data = xlsread(fullfile(base_path, 'table', 'behavioral_data.xlsx'));
 Country = categorical(behavioral_data(:, 1));    % Location (1 = Location 1, 2 = Location 2)
 ID = categorical(behavioral_data(:, 2));         % Participant ID
 AGE = behavioral_data(:, 3);                     % Age in months
-SEX = categorical(behavioral_data(:, 4));        % Sex
+SEX = categorical(behavioral_data(:, 4));        % Sex (1 = male, 2 = female)
+blocks = categorical(behavioral_data(:, 5));     % Experimental block
 learning = behavioral_data(:, 7);                % Learning score (word2 - word1 looking time)
+total_looking_time = behavioral_data(:, 8);      % Total looking time (word1 + word2)
 Attention = behavioral_data(:, 9) * 60;          % Attention score (converted to seconds)
-blocks = behavioral_data(:, 5);                  % Experimental block
 
 % Create condition indices
 c1 = find(behavioral_data(:, 6) == 1);  % Full gaze condition
@@ -59,6 +68,8 @@ location1 = find(behavioral_data(:, 1) == 1);  % Location 1 cohort
 location2 = find(behavioral_data(:, 1) == 2);  % Location 2 cohort
 
 %% Load and merge gaze data
+
+fprintf('Loading gaze data...\n');
 
 % Load gaze data for Location 1
 load(fullfile(base_path, 'attendance_data_location1.mat'));
@@ -177,16 +188,19 @@ duration = duration / 200;  % Sampling rate = 200 Hz
 
 % Extract CDI Gesture scores
 CDIG = NaN(size(behavioral_data, 1), 1);
+
 for i = 1:size(behavioral_data, 1)
     for j = 1:size(cdi_data, 1)
         if behavioral_data(i, 2) == cdi_data(j, 2)
-            CDIG(i) = cdi_data(j, 12);
+            CDIG(i) = cdi_data(j, 12);  % CDI Gestures
             break;
         end
     end
 end
 
 %% Table 1: Performance metrics by condition
+
+fprintf('\n=== TABLE 1: PERFORMANCE METRICS BY CONDITION ===\n');
 
 % Calculate descriptive statistics for learning
 N1 = sum(~isnan(learning(c1)));
@@ -197,7 +211,7 @@ learning_stats = [nanmean(learning(c1)), nanstd(learning(c1)), ...
                   nanmean(learning(c2)), nanstd(learning(c2)), ...
                   nanmean(learning(c3)), nanstd(learning(c3))];
 
-fprintf('\nTable 1: Learning scores by condition\n');
+fprintf('\nLearning scores by condition\n');
 fprintf('Full gaze: %.2f ± %.2f (n=%d)\n', learning_stats(1), learning_stats(2), N1);
 fprintf('Partial gaze: %.2f ± %.2f (n=%d)\n', learning_stats(3), learning_stats(4), N2);
 fprintf('No gaze: %.2f ± %.2f (n=%d)\n', learning_stats(5), learning_stats(6), N3);
@@ -216,7 +230,9 @@ fprintf('Full gaze: %.2f ± %.2f (n=%d)\n', attention_stats(1), attention_stats(
 fprintf('Partial gaze: %.2f ± %.2f (n=%d)\n', attention_stats(3), attention_stats(4), N2);
 fprintf('No gaze: %.2f ± %.2f (n=%d)\n', attention_stats(5), attention_stats(6), N3);
 
-%% Learning analysis with covariates
+%% Learning analysis with covariates (one-sample t-tests)
+
+fprintf('\n=== LEARNING ANALYSIS WITH COVARIATES ===\n');
 
 % Adjust learning scores for covariates (age, sex, location)
 % Full gaze condition
@@ -276,6 +292,8 @@ dataTable = table(cond, duration, onsetnum, blocks, Country, ID, AGE, SEX, CDIG,
 
 %% Attention analysis by location
 
+fprintf('\n=== ATTENTION ANALYSIS BY LOCATION ===\n');
+
 % Mixed model for number of attention onsets by location
 fprintf('\nMixed model: Number of attention onsets by location\n');
 lme_onsetnum = fitlme(dataTable, 'onsetnum ~ AGE + SEX + Country + (1|ID)');
@@ -293,6 +311,8 @@ disp(lme_attention);
 
 %% Attention analysis by condition
 
+fprintf('\n=== ATTENTION ANALYSIS BY CONDITION ===\n');
+
 % Mixed model for number of attention onsets by condition
 fprintf('\nMixed model: Number of attention onsets by condition\n');
 lme_onsetnum_cond = fitlme(dataTable, 'onsetnum ~ AGE + SEX + Country + cond + (1|ID)');
@@ -308,7 +328,60 @@ fprintf('\nMixed model: Total attention by condition\n');
 lme_attention_cond = fitlme(dataTable, 'Attention ~ AGE + SEX + Country + cond + (1|ID)');
 disp(lme_attention_cond);
 
+% Pairwise comparisons (swap conditions to test Partial vs No gaze)
+fprintf('\nPairwise comparison: Partial vs No gaze\n');
+temp_cond = behavioral_data(:, 6);
+temp_cond(temp_cond == 1) = 4;  % Temporarily change Full gaze
+temp_cond(temp_cond == 2) = 1;  % Partial becomes reference
+temp_cond(temp_cond == 4) = 2;  % Full becomes second category
+cond_swapped = categorical(temp_cond);
+
+dataTable_swapped = table(cond_swapped, duration, onsetnum, blocks, Country, ID, AGE, SEX, CDIG, learning, Attention);
+lme_attention_swap = fitlme(dataTable_swapped, 'Attention ~ AGE + SEX + Country + cond_swapped + (1|ID)');
+disp(lme_attention_swap);
+
+%% Learning-attention relationship
+
+fprintf('\n=== LEARNING-ATTENTION RELATIONSHIP ===\n');
+
+% Overall correlation across all conditions
+fprintf('\nMixed model: Learning and attention (all conditions)\n');
+lme_learning_attention = fitlme(dataTable, 'learning ~ Attention + AGE + SEX + Country + (1|ID)');
+disp(lme_learning_attention);
+
+% Partial correlation
+valid = intersect(find(~isnan(Attention)), find(~isnan(learning)));
+[r, p] = partialcorr(Attention(valid), learning(valid), behavioral_data(valid, [1,3,4]));
+fprintf('Partial correlation (controlling for location, age, sex): r = %.3f, p = %.4f\n', r, p);
+
+% Separate analyses by condition
+fprintf('\nMixed model: Learning and attention (Full gaze condition)\n');
+dataTable_c1 = dataTable(c1, :);
+lme_learning_attention_c1 = fitlme(dataTable_c1, 'learning ~ Attention + AGE + SEX + Country + (1|ID)');
+disp(lme_learning_attention_c1);
+
+fprintf('\nMixed model: Learning and attention (Partial gaze condition)\n');
+dataTable_c2 = dataTable(c2, :);
+lme_learning_attention_c2 = fitlme(dataTable_c2, 'learning ~ Attention + AGE + SEX + Country + (1|ID)');
+disp(lme_learning_attention_c2);
+
+fprintf('\nMixed model: Learning and attention (No gaze condition)\n');
+dataTable_c3 = dataTable(c3, :);
+lme_learning_attention_c3 = fitlme(dataTable_c3, 'learning ~ Attention + AGE + SEX + Country + (1|ID)');
+disp(lme_learning_attention_c3);
+
+%% Learning by location
+
+fprintf('\n=== LEARNING BY LOCATION ===\n');
+
+% Mixed model for learning by location
+fprintf('\nMixed model: Learning by location\n');
+lme_learning_location = fitlme(dataTable, 'learning ~ AGE + SEX + Country + (1|ID)');
+disp(lme_learning_location);
+
 %% CDI and learning analyses
+
+fprintf('\n=== CDI AND LEARNING ANALYSES ===\n');
 
 % Mixed model for overall learning with CDI Gesture scores
 fprintf('\nMixed model: Learning and CDI Gesture scores (all conditions)\n');
@@ -317,21 +390,31 @@ disp(lme_cdig);
 
 % Separate analyses by condition
 fprintf('\nMixed model: Learning and CDI Gesture scores (Full gaze condition)\n');
-dataTable_c1 = dataTable(c1, :);
 lme_cdig_c1 = fitlme(dataTable_c1, 'learning ~ CDIG + AGE + SEX + Country + (1|ID)');
 disp(lme_cdig_c1);
 
 fprintf('\nMixed model: Learning and CDI Gesture scores (Partial gaze condition)\n');
-dataTable_c2 = dataTable(c2, :);
 lme_cdig_c2 = fitlme(dataTable_c2, 'learning ~ CDIG + AGE + SEX + Country + (1|ID)');
 disp(lme_cdig_c2);
 
 fprintf('\nMixed model: Learning and CDI Gesture scores (No gaze condition)\n');
-dataTable_c3 = dataTable(c3, :);
 lme_cdig_c3 = fitlme(dataTable_c3, 'learning ~ CDIG + AGE + SEX + Country + (1|ID)');
 disp(lme_cdig_c3);
 
+% Collect p-values for FDR correction
+cdi_p_values = [lme_cdig.Coefficients.pValue(2), lme_cdig_c1.Coefficients.pValue(2), ...
+                lme_cdig_c2.Coefficients.pValue(2), lme_cdig_c3.Coefficients.pValue(2)];
+cdi_q_values = mafdr(cdi_p_values, 'BHFDR', true);
+
+fprintf('\nFDR-corrected p-values for CDI-learning relationships:\n');
+fprintf('All conditions: p = %.4f, corrected p = %.4f\n', cdi_p_values(1), cdi_q_values(1));
+fprintf('Full gaze: p = %.4f, corrected p = %.4f\n', cdi_p_values(2), cdi_q_values(2));
+fprintf('Partial gaze: p = %.4f, corrected p = %.4f\n', cdi_p_values(3), cdi_q_values(3));
+fprintf('No gaze: p = %.4f, corrected p = %.4f\n', cdi_p_values(4), cdi_q_values(4));
+
 %% CDI comparison between locations
+
+fprintf('\n=== CDI COMPARISON BETWEEN LOCATIONS ===\n');
 
 % Get unique participants for demographic analysis
 [~, unique_indices] = unique(behavioral_data(:, 2));
@@ -359,6 +442,8 @@ fprintf('Location 2: %.2f ± %.2f\n', mean(location2_cdig), std(location2_cdig))
 fprintf('t(%d) = %.2f, p = %.4f\n', stats.df, stats.tstat, p);
 
 %% Prepare data for plotting
+
+fprintf('\n=== DATA FOR PLOTTING ===\n');
 
 % Word 1 and Word 2 looking times (for Figure 1d)
 w = (behavioral_data(:, 8) * 2 - behavioral_data(:, 7)) ./ 2;  % Word 1
@@ -388,3 +473,5 @@ fprintf('No gaze onset number: %.2f ± %.2f\n', nanmean(onsetnum(c3)), nanstd(on
 fprintf('Full gaze duration: %.2f ± %.2f\n', nanmean(duration(c1)), nanstd(duration(c1)));
 fprintf('Partial gaze duration: %.2f ± %.2f\n', nanmean(duration(c2)), nanstd(duration(c2)));
 fprintf('No gaze duration: %.2f ± %.2f\n', nanmean(duration(c3)), nanstd(duration(c3)));
+
+fprintf('\nAnalysis complete.\n');
