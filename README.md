@@ -72,12 +72,12 @@ For any questions regarding this code repository, please contact:
 
 PI: Prof. Victoria Leong  
 
-Early Mental Potential and Wellbeing Research (EMPOWER) Centre,  
+Early Mental Potential and Wellbeing Research (EMPOWER) Centre (https://www.ntu.edu.sg/empower),  
 Nanyang Technological University, Singapore  
 Email: victorialeong@ntu.edu.sg
 
 or the author: Dr. Wei Zhang
 
-Early Mental Potential and Wellbeing Research (EMPOWER) Centre,  
+Early Mental Potential and Wellbeing Research (EMPOWER) Centre (https://www.ntu.edu.sg/empower),  
 Nanyang Technological University, Singapore  
 Email: wilson.zhangwei@ntu.edu.sg 
