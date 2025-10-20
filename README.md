@@ -34,6 +34,7 @@ All datasets have been made publicly available through Nanyang Technological Uni
 2. Preprocessed EEG data (https://doi.org/10.21979/N9/F9N5BE)
 3. Behavioral data (https://doi.org/10.21979/N9/4EBTKT)
 4. Audio stimuli (https://doi.org/10.21979/N9/TBTFTJ)
+5. Video stimuli (https://doi.org/10.21979/N9/NJ1KJA)
 
 ## Requirements
 
