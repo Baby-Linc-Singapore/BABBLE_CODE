@@ -1,10 +1,49 @@
 %% Mediation Analysis of Gaze, Neural Connectivity, and Learning
-% All datasets have been made publicly available through Nanyang Technological University (NTU)'s 
-% data repository (DR-NTU Data https://researchdata.ntu.edu.sg/) and can be accessed according to 
+% All datasets have been made publicly available through Nanyang Technological University (NTU)'s
+% data repository (DR-NTU Data https://researchdata.ntu.edu.sg/) and can be accessed according to
 % NTU's open access policy.
 %
-% Purpose: Analyze the relationship between different types of neural connectivity 
+% Purpose: Analyze the relationship between different types of neural connectivity
 % (adult-infant and infant-infant) and learning outcomes in infants using PLS regression
+%
+%% IMPORTANT: Exploratory Analysis Framework and Circularity Mitigation
+%
+% ANALYTICAL DEPENDENCY ACKNOWLEDGED:
+% The PLS-derived connectivity components (mediators) are optimized for
+% learning prediction, introducing analytical dependencies that preclude
+% strong causal inference. This analysis is positioned as exploratory
+% hypothesis-generation, not confirmatory causal testing.
+%
+% TWO-TIER VALIDATION STRATEGY:
+%
+% 1. Negative Control (Within-Infant Connectivity):
+%    - Infant-infant (II) GPDC subjected to identical PLS optimization
+%    - Should NOT mediate if effect is specific to adult-infant pathway
+%    - Result: No significant mediation (see Supplementary Section 7)
+%    - Interpretation: Validates pathway specificity
+%
+% 2. Independent Feature Selection (Single-Connection Validation - Step 18):
+%    - Adult Fz→Infant F4 connection identified SOLELY by gaze modulation
+%    - No learning data used in selection (Step 18)
+%    - Replicates mediation pattern with this single connection
+%    - Result: Indirect β = 0.08, p = .038; captures ~15% of network effect
+%    - Interpretation: Validates genuine neural pathway beyond artifacts
+%
+% CONVERGENCE OF EVIDENCE:
+% Both PLS-optimized network AND independently-selected connection show:
+%   - Significant indirect effects through AI connectivity
+%   - Non-significant direct effects of gaze
+% This convergence supports genuine mediation structure.
+%
+% LIMITATIONS:
+% - Cannot establish causal direction (adult→infant)
+% - Cannot rule out third-variable confounds
+% - Requires future experimental manipulation for causal claims
+%
+% REFERENCES:
+% - Reviewer Comment 2.3: Mediation circularity concerns
+% - Supplementary Section 4.3.5: Validation analyses
+% - Methods Section 4.5: Statistical analysis framework
 %
 % This script performs mediation analysis to:
 % 1. Test if neural synchrony measures mediate the relationship between gaze condition and learning
