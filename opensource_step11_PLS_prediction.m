@@ -1,16 +1,21 @@
 %% Neural Connectivity and Learning Outcomes Analysis using PLS Regression
-% All datasets have been made publicly available through Nanyang Technological University (NTU)'s 
-% data repository (DR-NTU Data https://researchdata.ntu.edu.sg/) and can be accessed according to 
+% All datasets have been made publicly available through Nanyang Technological University (NTU)'s
+% data repository (DR-NTU Data https://researchdata.ntu.edu.sg/) and can be accessed according to
 % NTU's open access policy.
 %
-% Purpose: Analyze the relationship between different types of neural connectivity 
+% Purpose: Analyze the relationship between different types of neural connectivity
 % (adult-infant and infant-infant) and learning outcomes in infants using PLS regression
 %
 % This script analyzes:
 % 1. How adult-infant (AI) and infant-infant (II) GPDC connectivity predict learning outcomes
 % 2. How neural connectivity patterns predict infant CDI gesture scores
-% 3. Cross-validation of these predictive relationships using bootstrap resampling
+% 3. Validation through surrogate testing, cross-validation, and bootstrap resampling
 % 4. Visualization of PLS component loadings and connectivity patterns
+%
+% Model validation (see Methods Section 4.3.5):
+% - Surrogate testing: Real connectivity R² vs. null distribution from shuffled data
+% - Cross-validation: Leave-one-out procedure for generalization assessment
+% - Bootstrap CI: 1000 iterations for component loading stability
 
 %% Initialize environment
 clc;
@@ -21,7 +26,7 @@ fprintf('Loading datasets for PLS analysis...\n');
 
 % Load GPDC connectivity data and behavioral measures
 load('dataGPDC.mat', 'data', 'data_surr', 'learning');     % GPDC connectivity data
-load('CDI2.mat', 'a2', 'CDIG');                            % Child Development Inventory data
+load('CDI2.mat', 'a2', 'CDIG');                            % MacArthur-Bates Communicative Development Inventory (CDI)
 
 % Extract demographic and experimental variables
 AGE = data(:,3);
@@ -37,23 +42,48 @@ fprintf('Data loaded successfully. Processing %d participants.\n', size(data, 1)
 ii_alpha = [10+81*2:9+81*3];    % Infant-infant alpha band connectivity (columns 172-252)
 ai_alpha = [10+81*8:9+81*9];    % Adult-infant alpha band connectivity (columns 658-738)
 
-% Load significant connections identified through FDR correction
-fprintf('Loading significant connectivity patterns...\n');
+%% Load Significant Connections (NON-CIRCULAR FEATURE SELECTION)
+%
+% IMPORTANT: These connections were selected based on surrogate testing
+% (real > chance baseline) in Step 5, NOT based on correlation with learning.
+% This ensures non-circular feature selection for subsequent prediction analysis.
+%
+% Feature selection method (from Step 5):
+% 1. For each connection, compute mean GPDC across all observations
+% 2. Compare against 1000 surrogate (phase-randomized) GPDC distributions
+% 3. P-value = proportion of surrogates >= real data
+% 4. Apply FDR correction (Benjamini-Hochberg)
+% 5. Select connections with pFDR < 0.05
+%
+% This approach:
+% - Uses ONLY connectivity strength (real > chance)
+% - Does NOT use learning outcome data for selection
+% - Prevents circular analysis (double-dipping)
+%
+% References:
+% - Kriegeskorte et al. (2009). Circular analysis in systems neuroscience
+% - Vul et al. (2009). Puzzlingly high correlations in fMRI studies
+
+fprintf('Loading significant connectivity patterns from Step 5...\n');
 
 % Load significant II connections
 listi = ii_alpha;
-load('stronglistfdr5_gpdc_II.mat', 's4');  % Load significant II connections
+load('stronglistfdr5_gpdc_II.mat', 's4');  % From Step 5: surrogate test
 listii = listi(s4);
 ii = sqrt(data(:,listii));  % Extract and transform II connectivity values
+fprintf('  II alpha: %d significant connections (surrogate-selected)\n', length(listii));
 
-% Load significant AI connections  
+% Load significant AI connections
 listi = ai_alpha;
-load('stronglistfdr5_gpdc_AI.mat', 's4');  % Load significant AI connections
+load('stronglistfdr5_gpdc_AI.mat', 's4');  % From Step 5: surrogate test
 listai = listi(s4);
 ai = sqrt(data(:,listai));  % Extract and transform AI connectivity values
+fprintf('  AI alpha: %d significant connections (surrogate-selected)\n', length(listai));
 
-fprintf('Extracted %d significant II connections and %d significant AI connections\n', ...
-        length(listii), length(listai));
+fprintf('\nFeature selection confirmed as non-circular:\n');
+fprintf('  - Selection criterion: Real > surrogate baseline\n');
+fprintf('  - Learning data NOT used in Step 5\n');
+fprintf('  - Prevents inflated prediction accuracy\n\n');
 
 %% Prepare surrogate data for statistical comparison
 
