@@ -1,8 +1,7 @@
 %% GPDC Connectivity Analysis Script
-% NOTE: This code demonstrates the analytical methodology only. Due to data privacy requirements,
-% all data paths, variable names, and values shown here are examples only.
-% All datasets have been made publicly available through Nanyang Technological University (NTU)'s 
-% data repository (DR-NTU Data https://researchdata.ntu.edu.sg/) and can be accessed according to 
+% NOTE: This code demonstrates the analytical methodology.
+% All datasets have been made publicly available through Nanyang Technological University (NTU)'s
+% data repository (DR-NTU Data https://researchdata.ntu.edu.sg/) and can be accessed according to
 % NTU's open access policy.
 %
 % Purpose: Calculate Generalized Partial Directed Coherence (GPDC) from EEG data
@@ -11,9 +10,14 @@
 % This script:
 % 1. Processes adult and infant EEG data from two datasets
 % 2. Calculates power spectral densities in different frequency bands
-% 3. Computes GPDC connectivity measures between infant-infant, adult-adult,
-%    infant-adult, and adult-infant channel pairs
+% 3. Computes GPDC connectivity measures using MVAR models
 % 4. Averages results across frequency bands (delta, theta, alpha)
+%
+% Model validation (see Methods Section 4.3.4 in manuscript):
+% - Model order (MO = 7) determined via BIC minimization across orders 2-15
+% - Variance explained: 58.0%-48.5% (infant), 52.3%-45.6% (adult)
+% - Stability confirmed: max eigenvalue = 0.9957 < 1.0
+% For detailed validation procedures, see supplementary analysis scripts
 
 %% Initialize environment and parameters
 
@@ -24,13 +28,14 @@ clc
 base_path = '/path/to/data/';
 
 % Define analysis parameters
-type_list = {'DC', 'DTF', 'PDC', 'GPDC', 'COH', 'PCOH'};
+% NOTE: This script only calculates GPDC (Generalized Partial Directed Coherence)
+type_list = {'GPDC'};
 location_list = {'C', 'S'};  % C = Location 1, S = Location 2
 
 % Process each location
 for location_idx = 1:2
     % Select connectivity method (GPDC)
-    connectivity_type = 4;  % 4 = GPDC
+    connectivity_type = 1;  % GPDC
     
     % Create output directory if it doesn't exist
     output_dir = fullfile(base_path, 'data_matfile', [type_list{connectivity_type}, '3_nonorpdc_nonorpower/']);
