@@ -1,12 +1,19 @@
-%% Statistical Analysis Script for CDI and Learning Outcomes
-% NOTE: This code demonstrates the analytical methodology only. Due to data privacy requirements,
-% all data paths, variable names, and values shown here are examples only.
-% All datasets have been made publicly available through Nanyang Technological University (NTU)'s 
-% data repository (DR-NTU Data https://researchdata.ntu.edu.sg/) and can be accessed according to 
+%% Statistical Analysis Script for Behavioral Data
+% NOTE: This code demonstrates the analytical methodology.
+% All datasets have been made publicly available through Nanyang Technological University (NTU)'s
+% data repository (DR-NTU Data https://researchdata.ntu.edu.sg/) and can be accessed according to
 % NTU's open access policy.
 %
-% Purpose: Analyze relationships between language learning outcomes, gaze conditions, 
-% attentional measures, and CDI gesture scores
+% Purpose: Analyze attention measures, CDI scores, and their relationships
+%
+% NOTE: Learning effect analysis (three-tier hierarchical testing) is in a separate script:
+%   → See opensource_step03a_learning_three_tier_analysis.m
+%
+% This script analyzes:
+% - Attention measures across gaze conditions and cohorts
+% - CDI gesture scores
+% - Correlations between attention and learning
+% - Country (cohort) effects
 %
 % This script:
 % 1. Loads behavioral data (looking time, attention, CDI scores)
@@ -230,57 +237,14 @@ fprintf('Full gaze: %.2f ± %.2f (n=%d)\n', attention_stats(1), attention_stats(
 fprintf('Partial gaze: %.2f ± %.2f (n=%d)\n', attention_stats(3), attention_stats(4), N2);
 fprintf('No gaze: %.2f ± %.2f (n=%d)\n', attention_stats(5), attention_stats(6), N3);
 
-%% Learning analysis with covariates (one-sample t-tests)
-
-fprintf('\n=== LEARNING ANALYSIS WITH COVARIATES ===\n');
-
-% Adjust learning scores for covariates (age, sex, location)
-% Full gaze condition
-X1 = [ones(size(behavioral_data(c1,1))), behavioral_data(c1,[1,3,4])];
-[~,~,resid1] = regress(learning(c1), X1);
-adjusted_scores1 = resid1 + nanmean(learning(c1));
-
-% Partial gaze condition
-X2 = [ones(size(behavioral_data(c2,1))), behavioral_data(c2,[1,3,4])];
-[~,~,resid2] = regress(learning(c2), X2);
-adjusted_scores2 = resid2 + nanmean(learning(c2));
-
-% No gaze condition
-X3 = [ones(size(behavioral_data(c3,1))), behavioral_data(c3,[1,3,4])];
-[~,~,resid3] = regress(learning(c3), X3);
-adjusted_scores3 = resid3 + nanmean(learning(c3));
-
-% One-sample t-tests on adjusted scores
-[h1, p1, CI1, stats1] = ttest(adjusted_scores1);
-[h2, p2, CI2, stats2] = ttest(adjusted_scores2);
-[h3, p3, CI3, stats3] = ttest(adjusted_scores3);
-
-% Apply FDR correction
-q = mafdr([p1, p2, p3], 'BHFDR', true);
-
-fprintf('\nOne-sample t-tests on learning scores (with covariates)\n');
-fprintf('Full gaze: t(%d) = %.2f, p = %.4f, corrected p = %.4f\n', stats1.df, stats1.tstat, p1, q(1));
-fprintf('Partial gaze: t(%d) = %.2f, p = %.4f, corrected p = %.4f\n', stats2.df, stats2.tstat, p2, q(2));
-fprintf('No gaze: t(%d) = %.2f, p = %.4f, corrected p = %.4f\n', stats3.df, stats3.tstat, p3, q(3));
-
-%% Observed power analysis
-
-% Calculate Cohen's d and observed power for significant effect
-cohen_d = stats1.tstat / sqrt(stats1.df + 1);
-n = stats1.df + 1;
-alpha = 0.05;
-
-% Calculate non-centrality parameter
-ncp = cohen_d * sqrt(n);
-
-% Calculate observed power
-df = n - 1;
-crit_t = tinv(1-alpha/2, df);  % Critical t-value (two-tailed)
-observed_power = 1 - nctcdf(crit_t, df, ncp);
-
-fprintf('\nObserved power analysis (Full gaze condition)\n');
-fprintf('Cohen\'s d: %.4f\n', cohen_d);
-fprintf('Observed power: %.4f\n', observed_power);
+%% NOTE: Learning Effect Analysis
+% Learning analysis (three-tier hierarchical testing) has been moved to:
+%   → opensource_step03a_learning_three_tier_analysis.m
+%
+% That script performs:
+%   - Tier 1: Omnibus ANOVA testing condition differences
+%   - Tier 2: Pairwise contrasts (FDR-corrected)
+%   - Tier 3: Within-condition baseline tests (learning > 0)
 
 %% Create data table for mixed models
 
