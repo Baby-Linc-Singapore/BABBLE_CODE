@@ -1,8 +1,7 @@
 %% Learning and Attention Analysis Script
-% NOTE: This code demonstrates the analytical methodology only. Due to data privacy requirements,
-% all data paths, variable names, and values shown here are examples only.
-% All datasets have been made publicly available through Nanyang Technological University (NTU)'s 
-% data repository (DR-NTU Data https://researchdata.ntu.edu.sg/) and can be accessed according to 
+% NOTE: This code demonstrates the analytical methodology.
+% All datasets have been made publicly available through Nanyang Technological University (NTU)'s
+% data repository (DR-NTU Data https://researchdata.ntu.edu.sg/) and can be accessed according to
 % NTU's open access policy.
 %
 % Purpose: Calculate learning scores and attention metrics from raw behavioral data
