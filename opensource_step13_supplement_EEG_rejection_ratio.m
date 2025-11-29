@@ -17,21 +17,21 @@
 %% Load and preprocess data
 
 % Set paths (modify as needed for your environment)
-filepath_data1 = '/path/to/dataset1/';
-filepath_data2 = '/path/to/dataset2/';
+filepath_data1 = '/path/to/dataset1/';  % UK data
+filepath_data2 = '/path/to/dataset2/';  % SG (Singapore) data
 
 % Participant ID lists
-% Dataset 1 participants
+% UK data participants
 P_data1 = {'101','102','103','104','105','106','107','108','109','111','114','117','118','119','121','122','123','124','125','126','127','128','129','131','132','133','135'};
 
-% Dataset 2 participants 
+% SG (Singapore) data participants
 P_data2 = {'101','104','106','107','108','110','114','115','116','117','120','121','122','123','127'};
 
 % Define electrodes to include (9-channel grid)
 include = [4:6,15:17,26:28]'; 
 chLabel = {'F3','Fz','F4','C3','Cz','C4','P3','Pz','P4'};
 
-%% Load and analyze data from dataset 1
+%% Load and analyze UK data (data1)
 data1 = struct();
 for p = 1:length(P_data1)
     % Load preprocessed EEG data
@@ -41,7 +41,7 @@ for p = 1:length(P_data1)
     data1(p).StimEEGart = loadedData.StimEEGart;
 end
 
-%% Load and analyze data from dataset 2
+%% Load and analyze SG (Singapore) data (data2)
 data2 = struct();
 for p = 1:length(P_data2)
     % Load preprocessed EEG data
@@ -116,9 +116,9 @@ unattended_data1 = result_data1(:,2)./total_data1;
 unattended_data2 = result_data2(:,2)./total_data2;
 
 fprintf('\n==== DATASET COMPARISON: UNATTENDED DATA ====\n');
-fprintf('Dataset 1 unattended (mean, std): [%.2f%%, %.2f%%]\n', 
+fprintf('UK data unattended (mean, std): [%.2f%%, %.2f%%]\n',
     mean(unattended_data1)*100, std(unattended_data1)*100);
-fprintf('Dataset 2 unattended (mean, std): [%.2f%%, %.2f%%]\n', 
+fprintf('SG data unattended (mean, std): [%.2f%%, %.2f%%]\n',
     mean(unattended_data2)*100, std(unattended_data2)*100);
 
 % Statistical test for unattended data between datasets
@@ -131,9 +131,9 @@ auto_rejected_data1 = result_data1(:,3)./(total_data1-result_data1(:,2));
 auto_rejected_data2 = result_data2(:,3)./(total_data2-result_data2(:,2));
 
 fprintf('\n==== DATASET COMPARISON: AUTO-REJECTED DATA ====\n');
-fprintf('Dataset 1 auto-rejected (mean, std): [%.2f%%, %.2f%%]\n', 
+fprintf('UK data auto-rejected (mean, std): [%.2f%%, %.2f%%]\n',
     mean(auto_rejected_data1)*100, std(auto_rejected_data1)*100);
-fprintf('Dataset 2 auto-rejected (mean, std): [%.2f%%, %.2f%%]\n', 
+fprintf('SG data auto-rejected (mean, std): [%.2f%%, %.2f%%]\n',
     mean(auto_rejected_data2)*100, std(auto_rejected_data2)*100);
 
 % Statistical test for auto-rejected data between datasets
