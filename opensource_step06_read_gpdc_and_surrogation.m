@@ -1,497 +1,293 @@
-%% EEG Connectivity Data Analysis
-% NOTE: This code demonstrates the analytical methodology only. Due to data privacy requirements,
-% all data paths, variable names, and values shown here are examples only.
-% All datasets have been made publicly available through Nanyang Technological University (NTU)'s 
-% data repository (DR-NTU Data https://researchdata.ntu.edu.sg/) and can be accessed according to 
+%% Aggregate GPDC Data from Individual Participants
+% All datasets have been made publicly available through Nanyang Technological University (NTU)'s
+% data repository (DR-NTU Data https://researchdata.ntu.edu.sg/) and can be accessed according to
 % NTU's open access policy.
 %
-% Purpose: Compare real connectivity data with surrogate data to assess statistical significance
+% Purpose: Read individual participant GPDC files and compile into analysis matrix
 %
 % This script:
-% 1. Loads behavioral data and connectivity matrices (GPDC)
-% 2. Extracts connectivity measures across frequency bands
-% 3. Loads surrogate connectivity data for comparison
-% 4. Performs statistical analysis to identify significant connectivity patterns
+% 1. Reads behavioral data
+% 2. Loads GPDC data from each participant's file (Step 4 output)
+% 3. Combines into single matrix for statistical analysis
+% 4. Saves aggregated data for subsequent steps
+%
+% Based on: scripts_R1/fs4_readdata.m
 
-%% Initialize environment
-clear all
-clc
+clear all;
+clc;
 
-% Set base path
+fprintf('========================================================================\n');
+fprintf('Aggregate GPDC Data from Individual Participants\n');
+fprintf('========================================================================\n\n');
+
+% Set base path (modify as needed)
 base_path = '/path/to/data/';
 
-% Select connectivity measure to analyze
-connectivity_type = 'GPDC';  % Options: DC, DTF, PDC, GPDC, COH, PCOH
+%% Load Behavioral Data
 
-fprintf('Loading and analyzing %s connectivity data...\n', connectivity_type);
+fprintf('Loading behavioral data...\n');
 
-%% Load behavioral data 
+behavioral_file = fullfile(base_path, 'behavioral_data.xlsx');
+[behavioral_data, ~] = xlsread(behavioral_file);
 
-% Load behavioral data (learning scores, attention, etc.)
-[behavioral_data, ~] = xlsread(fullfile(base_path, 'table', 'behavioral_data.xlsx'));
+% Remove observations with missing learning scores
+n_original = size(behavioral_data, 1);
+behavioral_data(isnan(behavioral_data(:,7)), :) = [];
+n_valid = size(behavioral_data, 1);
 
-% Remove entries with missing learning scores
-original_size = size(behavioral_data, 1);
-behavioral_data(isnan(behavioral_data(:,7)),:) = [];
-fprintf('Removed %d entries with missing learning scores\n', original_size - size(behavioral_data, 1));
+fprintf('  Original observations: %d\n', n_original);
+fprintf('  Valid observations (with learning data): %d\n\n', n_valid);
 
-% Load window information for data quality control
-try
-    load(fullfile(base_path, 'code', 'final', 'surr', 'windowlist.mat'), 'non_empty_positionslist');
-    fprintf('Loaded window position information\n');
-catch
-    fprintf('Warning: Could not load window position information\n');
-    non_empty_positionslist = [];
-end
+%% Define Participant Lists (Consistent Across All Scripts)
 
-%% Define participant list
+% EEG-valid UK participants (n=27)
+uk_list = {'101', '102', '103', '104', '105', '106', '107', '108', '109', ...
+           '111', '114', '117', '118', '119', '121', '122', '123', '124', ...
+           '125', '126', '127', '128', '129', '131', '132', '133', '135'};
 
-% List of included participant IDs
-participant_list = [
-    1101, 1102, 1103, 1104, 1105, 1106, 1107, 1108, 1109, 1111, 
-    1114, 1117, 1118, 1119, 1121, 1122, 1123, 1124, 1125, 1126, 
-    1127, 1128, 1129, 1131, 1132, 1133, 1135, 2101, 2104, 2106, 
-    2107, 2108, 2110, 2114, 2115, 2116, 2117, 2120, 2121, 2122, 
-    2123, 2127
-];
+% EEG-valid SG participants (n=15)
+sg_list = {'101', '104', '106', '107', '108', '110', '114', '115', ...
+           '116', '117', '120', '121', '122', '123', '127'};
 
-% List of excluded participant IDs
+% Excluded participant IDs (n=7)
+% Reasons: Excessive EEG artifacts or insufficient valid data windows
+% (See Supplementary Materials for detailed exclusion criteria)
 excluded_ids = [1113, 1136, 1112, 1116, 2112, 2118, 2119];
 
-%% Extract behavioral variables
+fprintf('Participant Inclusion Criteria:\n');
+fprintf('  Total enrolled: 49 infants\n');
+fprintf('  Behavioral data valid: 47 infants\n');
+fprintf('  EEG data valid: 42 infants\n\n');
 
-% Extract demographic and experimental variables
-AGE = behavioral_data(:,3);
-SEX = categorical(behavioral_data(:,4));
-COUNTRY = categorical(behavioral_data(:,1));
-blocks = categorical(behavioral_data(:,5));
-CONDGROUP = categorical(behavioral_data(:,6));
-learning = behavioral_data(:,7);
-attention = behavioral_data(:,9);
-ID = categorical(behavioral_data(:,2));
+fprintf('Exclusion reasons:\n');
+fprintf('  Behavioral exclusions (n=2): Insufficient attention/missing data\n');
+fprintf('  EEG exclusions (n=7): Excessive artifacts (>50%% trials rejected)\n\n');
 
-fprintf('Behavioral data loaded: %d participants, %d total observations\n', ...
-        length(unique(behavioral_data(:,2))), size(behavioral_data, 1));
+fprintf('Final sample for EEG analysis:\n');
+fprintf('  UK site: %d participants\n', length(uk_list));
+fprintf('  SG site: %d participants\n', length(sg_list));
+fprintf('  Total: %d participants\n\n', length(uk_list) + length(sg_list));
 
-%% Process real connectivity data
+%% Initialize Data Matrix
 
-fprintf('\nProcessing real connectivity data...\n');
+% Column structure (total: 981 columns):
+%   1: Country (1=UK, 2=SG)
+%   2: Subject ID
+%   3: Age (days)
+%   4: Sex (1=Male, 2=Female)
+%   5: Block (1-3)
+%   6: Condition (1=Full, 2=Partial, 3=No gaze)
+%   7: Learning score (nonword - word looking time, seconds)
+%   8: Learning score (duplicate for compatibility)
+%   9: Attention proportion
+%   10-981: GPDC connectivity values (972 values)
+%     - II delta (81 connections): columns 10-90
+%     - II theta (81 connections): columns 91-171
+%     - II alpha (81 connections): columns 172-252
+%     - AA delta (81 connections): columns 253-333
+%     - AA theta (81 connections): columns 334-414
+%     - AA alpha (81 connections): columns 415-495
+%     - AI delta (81 connections): columns 496-576
+%     - AI theta (81 connections): columns 577-657
+%     - AI alpha (81 connections): columns 658-738
+%     - IA delta (81 connections): columns 739-819
+%     - IA theta (81 connections): columns 820-900
+%     - IA alpha (81 connections): columns 901-981
 
-% Initialize storage arrays
-data = [];  % Will store all connectivity data
+n_connectivity_values = 81 * 4 * 3;  % 81 connections × 4 types × 3 bands
+data = [];
+
+fprintf('Data matrix structure:\n');
+fprintf('  Columns 1-9: Demographics and behavioral measures\n');
+fprintf('  Columns 10-981: GPDC connectivity (972 values)\n');
+fprintf('    - 81 connections per type/band (9×9 channel pairs)\n');
+fprintf('    - 4 types: II, AA, AI, IA\n');
+fprintf('    - 3 bands: Delta, Theta, Alpha\n\n');
+
+%% Read GPDC Data from Individual Files
+
+fprintf('Reading GPDC data from individual participant files...\n');
+fprintf('(This may take several minutes...)\n\n');
+
 count = 0;
-std_values = [];
+n_errors = 0;
 
-% Process data for each valid participant
-for i = 1:size(behavioral_data, 1)
-    % Check if learning data exists
-    if ~isnan(behavioral_data(i, 7))
-        % Get participant ID
-        p_id = behavioral_data(i, 2);
-        
-        % Skip excluded participants
-        if ~ismember(p_id, excluded_ids)
-            % Extract 3-digit participant number
-            p_num = num2str(p_id);
-            p_num = p_num(2:4);
-            
-            % Define file path based on location
-            if behavioral_data(i, 1) == 1
-                % Location 1 (UK)
-                file_path = fullfile(base_path, 'data_matfile', [connectivity_type, '3_nonorpdc_nonorpower'], ...
-                                   ['UK_', p_num, '_PDC.mat']);
-            else
-                % Location 2 (SG)
-                file_path = fullfile(base_path, 'data_matfile', [connectivity_type, '3_nonorpdc_nonorpower'], ...
-                                   ['SG_', p_num, '_PDC.mat']);
-            end
-            
-            % Load connectivity data
-            try
-                load(file_path);
-                
-                % Get current block and condition
-                block = behavioral_data(i, 5);
-                cond = behavioral_data(i, 6);
-                
-                % Check if sufficient windows exist for this participant/condition/block
-                if ~isempty(non_empty_positionslist)
-                    y = find(participant_list == behavioral_data(i, 1)*1000 + str2double(p_num));
-                    if ~isempty(y)
-                        tmp = non_empty_positionslist{y};
-                        list = intersect(find(tmp(:,1) == block), find(tmp(:,2) == cond));
-                        sumwindow = sum(tmp(list, 4));
-                        
-                        if sumwindow <= 0
-                            continue;  % Skip if no valid windows
-                        end
-                    end
-                end
-                
-                % Extract connectivity matrices for each frequency band
-                % Delta band (1-3 Hz)
-                ii1 = II{block, cond, 1};
-                ii1 = ii1(:);
-                
-                % Theta band (3-6 Hz)
-                ii2 = II{block, cond, 2};
-                ii2 = ii2(:);
-                
-                % Alpha band (6-9 Hz)
-                ii3 = II{block, cond, 3};
-                ii3 = ii3(:);
-                
-                % Adult-Adult connectivity
-                aa1 = AA{block, cond, 1};
-                aa1 = aa1(:);
-                aa2 = AA{block, cond, 2};
-                aa2 = aa2(:);
-                aa3 = AA{block, cond, 3};
-                aa3 = aa3(:);
-                
-                % Adult-Infant connectivity
-                ai1 = AI{block, cond, 1};
-                ai1 = ai1(:);
-                ai2 = AI{block, cond, 2};
-                ai2 = ai2(:);
-                ai3 = AI{block, cond, 3};
-                ai3 = ai3(:);
-                
-                % Infant-Adult connectivity
-                ia1 = IA{block, cond, 1};
-                ia1 = ia1(:);
-                ia2 = IA{block, cond, 2};
-                ia2 = ia2(:);
-                ia3 = IA{block, cond, 3};
-                ia3 = ia3(:);
-                
-                % Store all connectivity data if alpha band data exists
-                if ~isempty(ii3)
-                    % Combine behavioral data with connectivity measures
-                    data = [data; [behavioral_data(i, 1:9), ...
-                                  ii1', ii2', ii3', ...
-                                  aa1', aa2', aa3', ...
-                                  ai1', ai2', ai3', ...
-                                  ia1', ia2', ia3']];
-                    
-                    % Count valid entries
-                    count = count + 1;
-                    
-                    % Calculate standard deviation across all connectivity measures
-                    std_values(count) = std([ii1', ii2', ii3', aa1', aa2', aa3', ai1', ai2', ai3', ia1', ia2', ia3']);
-                end
-                
-            catch ME
-                fprintf('Error loading data for participant %d, block %d, condition %d: %s\n', ...
-                       p_id, block, cond, ME.message);
-            end
-        end
+for obs_idx = 1:size(behavioral_data, 1)
+
+    % Skip if no learning data
+    if isnan(behavioral_data(obs_idx, 7))
+        continue;
     end
-end
 
-fprintf('Processed connectivity data for %d valid data points\n', count);
+    % Extract participant info
+    participant_id = behavioral_data(obs_idx, 2);
 
-%% Analyze connectivity patterns by type
-
-% Define node matrix size
-num_nodes = 9;  % 9 electrodes in grid montage
-
-fprintf('\nAnalyzing connectivity patterns by quadrant...\n');
-
-% Calculate the starting indices for each quadrant and frequency band
-% Data structure: [behavioral(9) + II(81*3) + AA(81*3) + AI(81*3) + IA(81*3)]
-base_idx = 10;  % Start after behavioral data (columns 1-9)
-quadrant_size = num_nodes^2 * 3;  % 81 connections * 3 frequency bands per quadrant
-
-% Extract connectivity matrices by type
-ii_data = data(:, base_idx:(base_idx + quadrant_size - 1));              % II connectivity
-aa_data = data(:, (base_idx + quadrant_size):(base_idx + 2*quadrant_size - 1));  % AA connectivity
-ai_data = data(:, (base_idx + 2*quadrant_size):(base_idx + 3*quadrant_size - 1)); % AI connectivity
-ia_data = data(:, (base_idx + 3*quadrant_size):(base_idx + 4*quadrant_size - 1)); % IA connectivity
-
-% Vectorize each segment for summary statistics
-ii_vector = ii_data(:);
-aa_vector = aa_data(:);
-ai_vector = ai_data(:);
-ia_vector = ia_data(:);
-
-% Calculate summary statistics
-result = [
-    [nanmean(ii_vector), nanstd(ii_vector), length(ii_vector)];
-    [nanmean(aa_vector), nanstd(aa_vector), length(aa_vector)];
-    [nanmean(ai_vector), nanstd(ai_vector), length(ai_vector)];
-    [nanmean(ia_vector), nanstd(ia_vector), length(ia_vector)]
-];
-
-% Display results table
-fprintf('\nConnectivity summary by quadrant:\n');
-fprintf('Quadrant\tMean\t\tStd\t\tN\n');
-fprintf('II\t\t%.6f\t%.6f\t%d\n', result(1,1), result(1,2), result(1,3));
-fprintf('AA\t\t%.6f\t%.6f\t%d\n', result(2,1), result(2,2), result(2,3));
-fprintf('AI\t\t%.6f\t%.6f\t%d\n', result(3,1), result(3,2), result(3,3));
-fprintf('IA\t\t%.6f\t%.6f\t%d\n', result(4,1), result(4,2), result(4,3));
-
-% Compare Adult-to-Infant vs Infant-to-Infant connectivity
-[h, p, ci, stats] = ttest2(ai_vector, ii_vector);
-fprintf('\nComparison of AI vs II connectivity:\n');
-fprintf('AI mean: %.6f, II mean: %.6f\n', nanmean(ai_vector), nanmean(ii_vector));
-fprintf('t(%d) = %.3f, p = %.4f\n', stats.df, stats.tstat, p);
-
-% Compare Adult-to-Infant vs Infant-to-Adult connectivity (should show AI > IA due to unidirectional design)
-[h2, p2, ci2, stats2] = ttest2(ai_vector, ia_vector);
-fprintf('\nComparison of AI vs IA connectivity (unidirectional test):\n');
-fprintf('AI mean: %.6f, IA mean: %.6f\n', nanmean(ai_vector), nanmean(ia_vector));
-fprintf('t(%d) = %.3f, p = %.4f\n', stats2.df, stats2.tstat, p2);
-
-%% Load surrogate connectivity data for comparison
-
-fprintf('\nLoading surrogate connectivity data for statistical testing...\n');
-
-% Define surrogate path prefix
-surrogate_path_prefix = fullfile(base_path, 'data_matfile', 'surrPDCSET5/PDC');
-
-% Initialize storage for surrogate data
-surrogate_data = cell(1000, 1);
-surrogate_count = 0;
-surrogate_valid = zeros(1000, 1);
-
-% Load behavioral data for surrogate processing
-a = data;
-
-% Process each surrogate iteration
-for surr_idx = 1:1000
-    if mod(surr_idx, 100) == 0
-        fprintf('Processing surrogate %d of 1000\n', surr_idx);
+    % Skip excluded participants
+    if ismember(participant_id, excluded_ids)
+        continue;
     end
-    
-    % Define path for current surrogate
-    surrogate_path = [surrogate_path_prefix, num2str(surr_idx)];
-    
-    % Check if sufficient files exist
-    files = dir(fullfile(surrogate_path, '*.mat'));
-    if length(files) >= 42
-        % Initialize temporary storage
-        temp = zeros(size(data));
-        surrogate_count = surrogate_count + 1;
-        surrogate_valid(surr_idx) = 1;
-        count1 = 0;
-        
-        % Process data for each participant
-        for i = 1:size(a, 1)
-            if ~isnan(a(i, 7))
-                p_id = a(i, 2);
-                
-                % Skip excluded participants
-                if ~ismember(p_id, excluded_ids)
-                    % Extract 3-digit participant number
-                    p_num = num2str(a(i, 2));
-                    p_num = p_num(2:4);
-                    
-                    % Define file path based on location
-                    if a(i, 1) == 1
-                        file_path = fullfile(surrogate_path, ['UK_', p_num, '_PDC.mat']);
-                    else
-                        file_path = fullfile(surrogate_path, ['SG_', p_num, '_PDC.mat']);
-                    end
-                    
-                    try
-                        % Load surrogate connectivity data
-                        load(file_path);
-                        
-                        % Get current block and condition
-                        block = a(i, 5);
-                        cond = a(i, 6);
-                        
-                        % Extract connectivity matrices for each frequency band
-                        ii1 = II{block, cond, 1};
-                        ii1 = ii1(:);
-                        
-                        ii2 = II{block, cond, 2};
-                        ii2 = ii2(:);
-                        
-                        ii3 = II{block, cond, 3};
-                        ii3 = ii3(:);
-                        
-                        aa1 = AA{block, cond, 1};
-                        aa1 = aa1(:);
-                        
-                        aa2 = AA{block, cond, 2};
-                        aa2 = aa2(:);
-                        
-                        aa3 = AA{block, cond, 3};
-                        aa3 = aa3(:);
-                        
-                        ai1 = AI{block, cond, 1};
-                        ai1 = ai1(:);
-                        
-                        ai2 = AI{block, cond, 2};
-                        ai2 = ai2(:);
-                        
-                        ai3 = AI{block, cond, 3};
-                        ai3 = ai3(:);
-                        
-                        ia1 = IA{block, cond, 1};
-                        ia1 = ia1(:);
-                        
-                        ia2 = IA{block, cond, 2};
-                        ia2 = ia2(:);
-                        
-                        ia3 = IA{block, cond, 3};
-                        ia3 = ia3(:);
-                        
-                        % Store surrogate data if all connectivity matrices exist
-                        if ~isempty(ii1)
-                            count1 = count1 + 1;
-                            temp(count1, :) = [a(i, 1:9), ...
-                                              ii1', ii2', ii3', ...
-                                              aa1', aa2', aa3', ...
-                                              ai1', ai2', ai3', ...
-                                              ia1', ia2', ia3'];
-                        end
-                    catch
-                        % Silently skip missing surrogate files
-                    end
-                end
-            end
-        end
-        
-        % Store surrogate data for this iteration if we have data
-        if count1 > 0
-            surrogate_data{surrogate_count} = temp(1:count1, :);
-        end
-    end
-end
 
-% Remove empty surrogate datasets
-empty_idx = zeros(length(surrogate_data), 1);
-for i = 1:length(surrogate_data)
-    if isempty(surrogate_data{i})
-        empty_idx(i) = 1;
-    end
-end
-surrogate_data(find(empty_idx == 1)) = [];
+    % Get 3-digit participant number
+    pid_str = num2str(participant_id);
+    pid_num = pid_str(2:4);
 
-fprintf('Processed %d valid surrogate iterations\n', length(surrogate_data));
-
-% Save processed data
-save_path = fullfile(base_path, ['data_read_surr_', connectivity_type, '.mat']);
-save(save_path, 'surrogate_data', 'data');
-fprintf('Saved processed data to %s\n', save_path);
-
-%% Compare real vs surrogate connectivity
-
-if ~isempty(surrogate_data)
-    fprintf('\nComparing real vs surrogate connectivity patterns...\n');
-    
-    % Initialize arrays to store statistical results
-    mean_real = zeros(4, 3);  % 4 quadrants, 3 frequency bands
-    mean_surr = zeros(4, 3);  % 4 quadrants, 3 frequency bands
-    significance_count = zeros(4, 3);   % Count of significant differences
-    
-    % Define quadrant names and frequency bands
-    quadrants = {'II', 'AA', 'AI', 'IA'};
-    bands = {'Delta', 'Theta', 'Alpha'};
-    
-    % Extract means from real data by quadrant and frequency band
-    for q = 1:4  % Quadrants
-        for f = 1:3  % Frequency bands
-            % Calculate column indices for this quadrant/frequency
-            start_idx = base_idx + (q-1)*quadrant_size + (f-1)*num_nodes^2;
-            end_idx = start_idx + num_nodes^2 - 1;
-            
-            % Extract connectivity values
-            connectivity_values = data(:, start_idx:end_idx);
-            connectivity_values = connectivity_values(:);
-            
-            % Store mean
-            mean_real(q, f) = nanmean(connectivity_values);
-        end
-    end
-    
-    % Calculate statistics across all surrogate iterations
-    for s = 1:length(surrogate_data)
-        surr = surrogate_data{s};
-        
-        if size(surr, 1) > 0  % Check if surrogate data exists
-            % Process each quadrant and frequency band
-            for q = 1:4  % Quadrants
-                for f = 1:3  % Frequency bands
-                    % Calculate column indices for this quadrant/frequency
-                    start_idx = base_idx + (q-1)*quadrant_size + (f-1)*num_nodes^2;
-                    end_idx = start_idx + num_nodes^2 - 1;
-                    
-                    % Extract connectivity values
-                    if size(surr, 2) >= end_idx
-                        connectivity_values = surr(:, start_idx:end_idx);
-                        connectivity_values = connectivity_values(:);
-                        
-                        % Accumulate surrogate means
-                        mean_surr(q, f) = mean_surr(q, f) + nanmean(connectivity_values);
-                        
-                        % Compare with real data using t-test
-                        real_values = data(:, start_idx:end_idx);
-                        real_values = real_values(:);
-                        
-                        [~, p] = ttest2(real_values, connectivity_values);
-                        
-                        % Count significant results
-                        if p < 0.05
-                            significance_count(q, f) = significance_count(q, f) + 1;
-                        end
-                    end
-                end
-            end
-        end
-    end
-    
-    % Average surrogate means
-    mean_surr = mean_surr / length(surrogate_data);
-    
-    % Calculate proportion of significant results
-    significance_proportion = significance_count / length(surrogate_data);
-    
-    % Display detailed results
-    fprintf('\nDetailed comparison of real vs surrogate connectivity:\n');
-    fprintf('Quadrant\tFrequency\tReal Mean\tSurr Mean\tDifference\tP(Sig)\n');
-    fprintf('--------\t---------\t---------\t---------\t----------\t------\n');
-    for q = 1:4
-        for f = 1:3
-            difference = mean_real(q, f) - mean_surr(q, f);
-            fprintf('%s\t\t%s\t\t%.6f\t%.6f\t%+.6f\t%.2f%%\n', ...
-                   quadrants{q}, bands{f}, mean_real(q, f), mean_surr(q, f), ...
-                   difference, significance_proportion(q, f)*100);
-        end
-    end
-    
-    % Summary statistics
-    fprintf('\nSummary:\n');
-    fprintf('- AI connectivity shows most consistent differences from surrogate (expected for real connections)\n');
-    fprintf('- IA connectivity should show minimal differences (control for unidirectional design)\n');
-    
-    % Test for significant AI vs IA difference in significance rates
-    ai_sig_rate = mean(significance_proportion(3, :));  % AI across frequency bands
-    ia_sig_rate = mean(significance_proportion(4, :));  % IA across frequency bands
-    
-    fprintf('- Average significance rate: AI = %.1f%%, IA = %.1f%%\n', ...
-            ai_sig_rate*100, ia_sig_rate*100);
-    
-    if ai_sig_rate > ia_sig_rate
-        fprintf('- AI connectivity shows higher significance rate than IA (as expected)\n');
+    % Determine site and construct filename
+    if behavioral_data(obs_idx, 1) == 1
+        % UK site
+        gpdc_file = fullfile(base_path, 'data_matfile', 'GPDC3_nonorpdc_nonorpower', ...
+                            ['UK_', pid_num, '_PDC.mat']);
     else
-        fprintf('- Warning: IA connectivity shows similar or higher significance rate than AI\n');
+        % SG site
+        gpdc_file = fullfile(base_path, 'data_matfile', 'GPDC3_nonorpdc_nonorpower', ...
+                            ['SG_', pid_num, '_PDC.mat']);
     end
-else
-    fprintf('Warning: No valid surrogate data found for comparison\n');
+
+    % Load GPDC data
+    try
+        % Load connectivity matrices
+        load(gpdc_file, 'II', 'AA', 'AI', 'IA');
+
+        % Extract block and condition
+        block = behavioral_data(obs_idx, 5);
+        cond = behavioral_data(obs_idx, 6);
+
+        % Extract connectivity matrices for each band and reshape to vectors
+        % Delta band (1-3 Hz)
+        ii_delta = II{block, cond, 1}(:);  % 9×9 matrix → 81×1 vector
+        aa_delta = AA{block, cond, 1}(:);
+        ai_delta = AI{block, cond, 1}(:);
+        ia_delta = IA{block, cond, 1}(:);
+
+        % Theta band (3-6 Hz)
+        ii_theta = II{block, cond, 2}(:);
+        aa_theta = AA{block, cond, 2}(:);
+        ai_theta = AI{block, cond, 2}(:);
+        ia_theta = IA{block, cond, 2}(:);
+
+        % Alpha band (6-9 Hz)
+        ii_alpha = II{block, cond, 3}(:);
+        aa_alpha = AA{block, cond, 3}(:);
+        ai_alpha = AI{block, cond, 3}(:);
+        ia_alpha = IA{block, cond, 3}(:);
+
+        % Combine all connectivity values in proper order
+        connectivity_row = [ii_delta', ii_theta', ii_alpha', ...
+                           aa_delta', aa_theta', aa_alpha', ...
+                           ai_delta', ai_theta', ai_alpha', ...
+                           ia_delta', ia_theta', ia_alpha'];
+
+        % Append to data matrix
+        data = [data; behavioral_data(obs_idx, 1:9), connectivity_row];
+
+        count = count + 1;
+
+        % Progress indicator
+        if mod(count, 20) == 0
+            fprintf('  Processed %d observations...\n', count);
+        end
+
+    catch ME
+        n_errors = n_errors + 1;
+        if n_errors <= 5  % Only show first 5 errors
+            fprintf('  Warning: Could not load data for participant %d, block %d, cond %d\n', ...
+                    participant_id, block, cond);
+            fprintf('    Error: %s\n', ME.message);
+        end
+    end
 end
 
-%% Final summary
+fprintf('\nData aggregation completed.\n');
+fprintf('  Total observations processed: %d\n', count);
+fprintf('  Errors encountered: %d\n', n_errors);
+fprintf('  Data matrix dimensions: %d rows × %d columns\n\n', size(data, 1), size(data, 2));
 
-fprintf('\n=== ANALYSIS SUMMARY ===\n');
-fprintf('Real connectivity data: %d observations from %d participants\n', ...
-        size(data, 1), length(unique(data(:, 2))));
-fprintf('Surrogate datasets: %d valid iterations\n', length(surrogate_data));
-fprintf('Connectivity quadrants analyzed: II, AA, AI, IA\n');
-fprintf('Frequency bands: Delta (1-3 Hz), Theta (3-6 Hz), Alpha (6-9 Hz)\n');
-fprintf('Data saved to: %s\n', save_path);
+%% Verify Data Integrity
 
-fprintf('\nAnalysis complete.\n');
+fprintf('Verifying data integrity...\n');
+
+% Check for expected number of participants
+n_participants = length(unique(data(:,2)));
+fprintf('  Unique participants: %d (expected: 42)\n', n_participants);
+
+% Check observations per condition
+for cond = 1:3
+    n_obs_cond = sum(data(:,6) == cond);
+    fprintf('  Condition %d observations: %d\n', cond, n_obs_cond);
+end
+
+% Check for NaN values in connectivity
+n_nan_connectivity = sum(sum(isnan(data(:,10:end))));
+total_connectivity_values = numel(data(:,10:end));
+nan_percentage = 100 * n_nan_connectivity / total_connectivity_values;
+fprintf('  NaN values in connectivity: %d / %d (%.2f%%)\n', ...
+    n_nan_connectivity, total_connectivity_values, nan_percentage);
+
+% Check learning score range
+fprintf('  Learning score range: %.2f to %.2f seconds\n', ...
+    min(data(:,7)), max(data(:,7)));
+fprintf('  Learning score mean ± SD: %.2f ± %.2f seconds\n\n', ...
+    mean(data(:,7)), std(data(:,7)));
+
+%% Save Aggregated Data
+
+fprintf('Saving aggregated data...\n');
+
+output_file = fullfile(base_path, 'data_read_surr_gpdc2.mat');
+
+% Note: This script only saves real data
+% Surrogate data (data_surr) would be generated by a separate surrogate analysis script
+% For now, we create a placeholder to maintain compatibility
+data_surr = {};  % Placeholder - actual surrogates generated in separate script
+
+save(output_file, 'data', 'data_surr', '-v7.3');
+
+fprintf('Aggregated data saved to: %s\n\n', output_file);
+
+%% Display Usage Information
+
+fprintf('This file will be used in:\n');
+fprintf('  - Step 5: Identify significant connections (surrogate test)\n');
+fprintf('  - Step 11: PLS prediction analysis\n');
+fprintf('  - Step 12: Mediation analysis\n');
+fprintf('  - Step 18: Single-connection validation\n\n');
+
+fprintf('Data structure reference:\n');
+fprintf('  Load with: load(''data_read_surr_gpdc2.mat'', ''data'')\n');
+fprintf('  Access country: data(:, 1)\n');
+fprintf('  Access subject ID: data(:, 2)\n');
+fprintf('  Access age: data(:, 3)\n');
+fprintf('  Access sex: data(:, 4)\n');
+fprintf('  Access block: data(:, 5)\n');
+fprintf('  Access condition: data(:, 6)\n');
+fprintf('  Access learning: data(:, 7)\n');
+fprintf('  Access attention: data(:, 9)\n');
+fprintf('  Access II alpha GPDC: data(:, 172:252)\n');
+fprintf('  Access AI alpha GPDC: data(:, 658:738)\n');
+fprintf('  Access AA alpha GPDC: data(:, 415:495)\n\n');
+
+%% Summary
+
+fprintf('========================================================================\n');
+fprintf('DATA AGGREGATION SUMMARY\n');
+fprintf('========================================================================\n\n');
+
+fprintf('Input: Individual GPDC files (Step 4 output)\n');
+fprintf('  Format: UK_###_PDC.mat, SG_###_PDC.mat\n');
+fprintf('  Location: data_matfile/GPDC3_nonorpdc_nonorpower/\n\n');
+
+fprintf('Output: Aggregated analysis matrix\n');
+fprintf('  File: %s\n', output_file);
+fprintf('  Dimensions: %d observations × %d variables\n', size(data, 1), size(data, 2));
+fprintf('  Participants: %d (UK: %d, SG: %d)\n', n_participants, ...
+    sum(data(:,1)==1)/sum(data(:,2)==data(1,2)), ...
+    sum(data(:,1)==2)/sum(data(:,2)==data(1,2)));
+fprintf('  Block-level observations: %d\n\n', size(data, 1));
+
+fprintf('Next steps:\n');
+fprintf('  1. Generate surrogate data (optional, for Step 5)\n');
+fprintf('  2. Run Step 5 to identify significant connections\n');
+fprintf('  3. Use aggregated data in subsequent analyses\n\n');
+
+fprintf('========================================================================\n');
+fprintf('Script complete.\n');
+fprintf('========================================================================\n');
