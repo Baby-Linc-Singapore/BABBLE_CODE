@@ -4,7 +4,7 @@ This repository contains the analysis code for the research paper:
 
 **Adult-infant neural coupling mediates infants’ selection of socially-relevant stimuli for learning across cultures**
 
-Zhang, Wei<sup>1,2</sup>, Clackson, Kaili<sup>1</sup>, Georgieva, Stanimira<sup>1</sup>, Santamaria, Lorena<sup>1</sup>, Reindl, Vanessa<sup>3,4</sup>, Noreika, Valdas<sup>5</sup>, Darby, Nicholas<sup>6</sup>, Valsdottir, Vaka<sup>6</sup>, Santhanakrishnan, Priyadharshini<sup>1</sup>, & Leong, Victoria<sup>1</sup>
+Wei Zhang<sup>1,2</sup>, Kaili Clackson<sup>1</sup>, Stanimira Georgieva<sup>1</sup>, Lorena Santamaria<sup>1</sup>, Vanessa Reindl<sup>3,4</sup>, Valdas Noreika<sup>5</sup>, Nicholas Darby<sup>6</sup>, Vaka Valsdottir<sup>6</sup>, Priyadharshini Santhanakrishnan<sup>1</sup>, & Victoria Leong<sup>1</sup>
 
 <sup>1</sup> Early Mental Potential and Wellbeing Research (EMPOWER) Centre, Nanyang Technological University, Singapore
 <sup>2</sup> Cognitive Neuroimaging Centre, Nanyang Technological University, Singapore
@@ -25,15 +25,71 @@ If you use this code in your research, please cite our paper:
 Zhang, W., Clackson, K., Georgieva, S., Santamaria, L., Reindl, V., Noreika, V., Darby, N., Valsdottir, V., Santhanakrishnan, P., & Leong, V. (2025). Adult-infant neural coupling mediates infants’ selection of socially-relevant stimuli for learning across cultures.
 ```
 
-## Important Note on Data Availability
+## Data Availability
 
-**This code repository demonstrates the analytical methodology only.** Due to data privacy requirements, all data paths, variable names, and values shown in this repository are pseudo data as examples only. The actual analysis was performed on protected research data.
+All datasets have been made publicly available through Nanyang Technological University (NTU)'s data repository (DR-NTU Data https://researchdata.ntu.edu.sg/) and can be accessed according to NTU's open access policy:
 
-All datasets have been made publicly available through Nanyang Technological University (NTU)'s data repository (DR-NTU Data https://researchdata.ntu.edu.sg/) and can be accessed according to NTU's open access policy. We provide separate downloads for:
-1. Raw EEG data (https://doi.org/10.21979/N9/BQLIB9)
-2. Preprocessed EEG data (https://doi.org/10.21979/N9/F9N5BE)
-3. Behavioral data (https://doi.org/10.21979/N9/4EBTKT)
-4. Video stimuli (https://doi.org/10.21979/N9/NJ1KJA)
+1. **Raw EEG data**: https://doi.org/10.21979/N9/BQLIB9
+2. **Preprocessed EEG data**: https://doi.org/10.21979/N9/F9N5BE
+3. **Behavioral data**: https://doi.org/10.21979/N9/4EBTKT
+4. **Video stimuli**: https://doi.org/10.21979/N9/NJ1KJA
+
+This code repository demonstrates the analytical methodology used in our study. The scripts are designed to work with the publicly available data listed above.
+
+## Analysis Pipeline
+
+The analysis consists of the following sequential steps.
+
+### Core Analysis Scripts
+
+1. **Step 01**: Calculate attention measures from EEG segments
+2. **Step 02**: Calculate learning scores and attention proportions
+3. **Step 03 (Behavior)**: Behavioral analyses (attention, CDI, demographics)
+4. **Step 03 (Learning)**: Three-tier hierarchical learning analysis
+5. **Step 04**: Calculate GPDC (Generalized Partial Directed Coherence) connectivity
+   - Input: Preprocessed EEG data (individual participant files)
+   - Output: GPDC matrices for each participant/block/condition
+   - Format: `UK_###_PDC.mat`, `SG_###_PDC.mat`
+
+6. **Step 05**: Identify significant connections (NON-CIRCULAR)
+   - **NEW**: Surrogate testing for feature selection
+   - Input: Step 6 aggregated data + surrogate distributions
+   - Method: Real vs. surrogate baseline (NO learning data used)
+   - Output: `stronglistfdr5_gpdc_*.mat` files
+   - Purpose: Prevents circular analysis in subsequent steps
+
+7. **Step 06**: Aggregate GPDC data into analysis matrix
+   - **NEW**: Data integration script
+   - Input: Individual GPDC files from Step 4
+   - Output: `data_read_surr_gpdc2.mat` (226 obs × 981 variables)
+   - Structure: Demographics + 972 connectivity values
+   - Used by: Steps 5, 11, 12, 18
+
+8. **Step 07-10**: Additional connectivity analyses
+9. **Step 11**: PLS (Partial Least Squares) prediction of learning from connectivity
+   - Uses significant connections from Step 5 (non-circular!)
+   - Validation: Surrogate testing, cross-validation, bootstrap
+
+10. **Step 12**: Mediation analysis (gaze → connectivity → learning pathway)
+    - Exploratory analysis with analytical dependencies acknowledged
+    - Validation: Negative controls (II GPDC) + Step 18 convergence
+
+### Model Validation Scripts
+
+11. **Step 16**: BIC-based MVAR model order selection
+12. **Step 17**: MVAR model diagnostics (variance explained, stability analysis)
+13. **Step 18**: Single-connection validation (non-circular feature selection)
+    - **UPDATED**: Fully runnable with LME bootstrap mediation
+    - Method: Condition-based selection (gaze effect, NO learning data)
+    - Identifies: Adult Fz → Infant F4 (sole significant connection, pFDR=.048)
+    - Tests: Full mediation pathway with 1000 bootstrap iterations
+    - Result: Convergence with main analysis validates genuine neural pathway
+14. **Step 19**: Frequency robustness analysis (delta, theta, alpha bands)
+15. **Step 20**: Statistical power and sensitivity analysis
+16. **Step 21**: Alternative mediation models (negative controls)
+17. **Step 22**: Order effects analysis (within-subjects design validation)
+
+These validation scripts demonstrate rigorous model selection, adequacy checks, and methodological robustness for all major analyses.
 
 ## Requirements
 
@@ -41,10 +97,6 @@ The code in this repository requires the following major dependencies:
 - MATLAB R2024b (https://www.mathworks.com)
 - EEGLAB 2021.1 (https://eeglab.org/)
 - eMVAR (http://www.lucafaes.net/emvar.html)
-
-## Usage
-
-Please refer to the codes for specific usage instructions. Each code file contains a summary explaining the purpose and usage of the scripts.
 
 ## Acknowledgements
 
