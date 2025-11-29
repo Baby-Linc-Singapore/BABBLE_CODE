@@ -38,58 +38,33 @@ This code repository demonstrates the analytical methodology used in our study. 
 
 ## Analysis Pipeline
 
-The analysis consists of the following sequential steps.
-
-### Core Analysis Scripts
+The analysis consists of 24 sequential steps:
 
 1. **Step 01**: Calculate attention measures from EEG segments
 2. **Step 02**: Calculate learning scores and attention proportions
-3. **Step 03 (Behavior)**: Behavioral analyses (attention, CDI, demographics)
-4. **Step 03 (Learning)**: Three-tier hierarchical learning analysis
-5. **Step 04**: Calculate GPDC (Generalized Partial Directed Coherence) connectivity
-   - Input: Preprocessed EEG data (individual participant files)
-   - Output: GPDC matrices for each participant/block/condition
-   - Format: `UK_###_PDC.mat`, `SG_###_PDC.mat`
-
-6. **Step 05**: Identify significant connections (NON-CIRCULAR)
-   - **NEW**: Surrogate testing for feature selection
-   - Input: Step 6 aggregated data + surrogate distributions
-   - Method: Real vs. surrogate baseline (NO learning data used)
-   - Output: `stronglistfdr5_gpdc_*.mat` files
-   - Purpose: Prevents circular analysis in subsequent steps
-
-7. **Step 06**: Aggregate GPDC data into analysis matrix
-   - **NEW**: Data integration script
-   - Input: Individual GPDC files from Step 4
-   - Output: `data_read_surr_gpdc2.mat` (226 obs × 981 variables)
-   - Structure: Demographics + 972 connectivity values
-   - Used by: Steps 5, 11, 12, 18
-
-8. **Step 07-10**: Additional connectivity analyses
-9. **Step 11**: PLS (Partial Least Squares) prediction of learning from connectivity
-   - Uses significant connections from Step 5 (non-circular!)
-   - Validation: Surrogate testing, cross-validation, bootstrap
-
-10. **Step 12**: Mediation analysis (gaze → connectivity → learning pathway)
-    - Exploratory analysis with analytical dependencies acknowledged
-    - Validation: Negative controls (II GPDC) + Step 18 convergence
-
-### Model Validation Scripts
-
-11. **Step 16**: BIC-based MVAR model order selection
-12. **Step 17**: MVAR model diagnostics (variance explained, stability analysis)
-13. **Step 18**: Single-connection validation (non-circular feature selection)
-    - **UPDATED**: Fully runnable with LME bootstrap mediation
-    - Method: Condition-based selection (gaze effect, NO learning data)
-    - Identifies: Adult Fz → Infant F4 (sole significant connection, pFDR=.048)
-    - Tests: Full mediation pathway with 1000 bootstrap iterations
-    - Result: Convergence with main analysis validates genuine neural pathway
-14. **Step 19**: Frequency robustness analysis (delta, theta, alpha bands)
-15. **Step 20**: Statistical power and sensitivity analysis
-16. **Step 21**: Alternative mediation models (negative controls)
-17. **Step 22**: Order effects analysis (within-subjects design validation)
-
-These validation scripts demonstrate rigorous model selection, adequacy checks, and methodological robustness for all major analyses.
+3. **Step 03**: Behavioral analyses (attention, CDI, demographics)
+4. **Step 03a**: Three-tier hierarchical learning analysis
+5. **Step 04**: Calculate GPDC (Generalized Partial Directed Coherence) connectivity matrices
+6. **Step 05**: Identify significant connections via surrogate testing (non-circular)
+7. **Step 05a**: Generate surrogate distributions for GPDC validation
+8. **Step 06**: Aggregate individual GPDC files into analysis matrix
+9. **Step 06a**: Read and organize GPDC and surrogate data
+10. **Step 07**: GPDC statistical testing and visualization
+11. **Step 08**: Neural entrainment analysis between speech and EEG
+12. **Step 09**: Generate surrogate data for entrainment analysis
+13. **Step 10**: Statistical testing of entrainment effects
+14. **Step 11**: PLS (Partial Least Squares) regression predicting learning from connectivity
+15. **Step 12**: Mediation analysis (gaze → connectivity → learning pathway)
+16. **Step 13**: Calculate EEG data rejection ratios
+17. **Step 14**: Sample size and statistical power estimation
+18. **Step 15**: Subject-level learning analysis
+19. **Step 16**: BIC-based MVAR model order selection
+20. **Step 17**: MVAR model diagnostics (variance explained, stability)
+21. **Step 18**: Single-connection validation with non-circular feature selection
+22. **Step 19**: Frequency robustness analysis (delta, theta, alpha bands)
+23. **Step 20**: Statistical power and sensitivity analysis
+24. **Step 21**: Alternative mediation models (negative controls)
+25. **Step 22**: Order effects analysis (within-subjects design validation)
 
 ## Requirements
 
