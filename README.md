@@ -15,7 +15,7 @@ Wei Zhang<sup>1,2</sup>, Kaili Clackson<sup>1</sup>, Stanimira Georgieva<sup>1</
 
 ## Overview
 
-This repository contains the analytical code used to investigate how adult-infant neural coupling mediates the selection of socially-relevant stimuli for learning in both British and Singaporean infant populations. The analysis focuses on neural synchrony between adults and infants during social interaction, and how this relates to learning outcomes.
+This repository contains the analytical code used to investigate how adult-infant neural coupling mediates the selection of socially-relevant stimuli for learning in both British and Singaporean infant populations. The analysis focuses on neural synchrony between adult speaker and infants listener through the use of pre-recorded video, and how this relates to statistical learning outcomes.
 
 ## Citation
 
