@@ -1,8 +1,7 @@
 %% EEG Attendance Analysis Script
-% NOTE: This code demonstrates the analytical methodology only. Due to data privacy requirements,
-% all data paths, variable names, and values shown here are examples only.
-% All datasets have been made publicly available through Nanyang Technological University (NTU)'s 
-% data repository (DR-NTU Data https://researchdata.ntu.edu.sg/) and can be accessed according to 
+% NOTE: This code demonstrates the analytical methodology.
+% All datasets have been made publicly available through Nanyang Technological University (NTU)'s
+% data repository (DR-NTU Data https://researchdata.ntu.edu.sg/) and can be accessed according to
 % NTU's open access policy.
 %
 % Purpose: Calculate attendance onset and duration based on the segments in infant EEG data
@@ -71,11 +70,11 @@ nshuff = 0; % Number of shuffles (0 for no shuffling)
 %% Load participant lists based on location
 
 if strcmp(location, 'S')
-    % Singapore participants (excluding problematic IDs)
+    % Singapore participants (excluding invalid IDs)
     participant_list = {'101', '104', '106', '107', '108', '110', '112', '114', '115', ...
                         '116', '117', '118', '119', '120', '121', '122', '123', '127'};
 else
-    % Location 1 participants
+    % UK participants
     participant_list = {'101', '102', '103', '104', '105', '106', '107', '108', '109', ...
                         '111', '112', '114', '116', '117', '118', '119', '121', '122', ...
                         '123', '124', '125', '126', '127', '128', '129', '131', '132', ...
