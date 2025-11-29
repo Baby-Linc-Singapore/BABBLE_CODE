@@ -391,7 +391,7 @@ for surr_idx = 1:num_surrogates
             data_dir = fullfile(base_path, 'Preprocessed_Data_sg/');
             list_ppts = dir(fullfile(data_dir, 'P*/P1*_BABBLE_AR.mat'));
         else
-            sg = 0;  % Cambridge
+            sg = 0;  % UK
             data_dir = fullfile(base_path, 'Preprocessed_Data_camb/');
             list_ppts = dir(fullfile(data_dir, 'P*/*_BABBLE_AR.mat'));
         end
