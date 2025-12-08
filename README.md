@@ -38,33 +38,32 @@ This code repository demonstrates the analytical methodology used in our study. 
 
 ## Analysis Pipeline
 
-The analysis consists of 24 sequential steps:
-
- **Step 01**: Calculate attention measures from EEG segments
- **Step 02**: Calculate learning scores and attention proportions
- **Step 03**: Behavioral analyses (attention, CDI, demographics)
- **Step 03a**: Three-tier hierarchical learning analysis
- **Step 04**: Calculate GPDC (Generalized Partial Directed Coherence) connectivity matrices
- **Step 05**: Identify significant connections via surrogate testing (non-circular)
- **Step 05a**: Generate surrogate distributions for GPDC validation
- **Step 06**: Aggregate individual GPDC files into analysis matrix
- **Step 06a**: Read and organize GPDC and surrogate data
- **Step 07**: GPDC statistical testing and visualization
- **Step 08**: Neural entrainment analysis between speech and EEG
- **Step 09**: Generate surrogate data for entrainment analysis
- **Step 10**: Statistical testing of entrainment effects
- **Step 11**: PLS (Partial Least Squares) regression predicting learning from connectivity
- **Step 12**: Mediation analysis (gaze → connectivity → learning pathway)
- **Step 13**: Calculate EEG data rejection ratios
- **Step 14**: Sample size and statistical power estimation
- **Step 15**: Subject-level learning analysis
- **Step 16**: BIC-based MVAR model order selection
- **Step 17**: MVAR model diagnostics (variance explained, stability)
- **Step 18**: Single-connection validation with non-circular feature selection
- **Step 19**: Frequency robustness analysis (delta, theta, alpha bands)
- **Step 20**: Statistical power and sensitivity analysis
- **Step 21**: Alternative mediation models (negative controls)
- **Step 22**: Order effects analysis (within-subjects design validation)
+The analysis consists of these sequential steps:  
+**Step 01**: Calculate attention measures from EEG segments  
+**Step 02**: Calculate learning scores and attention proportions  
+**Step 03**: Behavioral analyses (attention, CDI, demographics)  
+**Step 03a**: Three-tier hierarchical learning analysis  
+**Step 04**: Calculate GPDC (Generalized Partial Directed Coherence) connectivity matrices  
+**Step 05**: Identify significant connections via surrogate testing (non-circular)  
+**Step 05a**: Generate surrogate distributions for GPDC validation  
+**Step 06**: Aggregate individual GPDC files into analysis matrix  
+**Step 06a**: Read and organize GPDC and surrogate data  
+**Step 07**: GPDC statistical testing and visualization  
+**Step 08**: Neural entrainment analysis between speech and EEG  
+**Step 09**: Generate surrogate data for entrainment analysis  
+**Step 10**: Statistical testing of entrainment effects  
+**Step 11**: PLS (Partial Least Squares) regression predicting learning from connectivity  
+**Step 12**: Mediation analysis (gaze → connectivity → learning pathway)  
+**Step 13**: Calculate EEG data rejection ratios  
+**Step 14**: Sample size and statistical power estimation  
+**Step 15**: Subject-level learning analysis  
+**Step 16**: BIC-based MVAR model order selection  
+**Step 17**: MVAR model diagnostics (variance explained, stability)  
+**Step 18**: Single-connection validation with non-circular feature selection  
+**Step 19**: Frequency robustness analysis (delta, theta, alpha bands)  
+**Step 20**: Statistical power and sensitivity analysis  
+**Step 21**: Alternative mediation models (negative controls)  
+**Step 22**: Order effects analysis (within-subjects design validation)
 
 ## Requirements
 
