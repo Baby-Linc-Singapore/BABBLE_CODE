@@ -21,9 +21,7 @@
 % Statistical framework follows:
 % - Saffran et al., 1996 (statistical learning paradigm)
 % - Cho & Abe, 2013; Hales, 2024 (one-tailed test justification)
-%
-% Author: Wei Zhang
-% Last updated: 2025-01-20
+
 
 %% Initialize environment
 clear all
@@ -407,3 +405,4 @@ function marker = sig_marker(p)
         marker = '';
     end
 end
+
