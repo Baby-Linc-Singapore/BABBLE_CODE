@@ -1,8 +1,8 @@
-# Adult-Infant Neural Coupling Analysis
+# Adult-to-Infant Neural Coupling Analysis
 
 This repository contains the analysis code for the research paper:
 
-**Adult-infant neural coupling mediates infants’ selection of socially-relevant stimuli for learning across cultures**
+**Adult-to-Infant neural coupling mediates infants’ selection of socially-relevant stimuli for learning across cultures**
 
 Wei Zhang<sup>1,2</sup>, Kaili Clackson<sup>1</sup>, Stanimira Georgieva<sup>1</sup>, Lorena Santamaria<sup>1</sup>, Vanessa Reindl<sup>3,4</sup>, Valdas Noreika<sup>5</sup>, Nicholas Darby<sup>6</sup>, Vaka Valsdottir<sup>6</sup>, Priyadharshini Santhanakrishnan<sup>1</sup>, & Victoria Leong<sup>1,*</sup>
 
@@ -15,14 +15,14 @@ Wei Zhang<sup>1,2</sup>, Kaili Clackson<sup>1</sup>, Stanimira Georgieva<sup>1</
 
 ## Overview
 
-This repository contains the analytical code used to investigate how adult-infant neural coupling mediates the selection of socially-relevant stimuli for learning in both British and Singaporean infant populations. The analysis focuses on neural synchrony between adult speaker and infants listener through the use of pre-recorded video, and how this relates to statistical learning outcomes.
+This repository contains the analytical code used to investigate how Adult-to-Infant neural coupling mediates the selection of socially-relevant stimuli for learning in both British and Singaporean infant populations. The analysis focuses on neural synchrony between adult speaker and infants listener through the use of pre-recorded video, and how this relates to statistical learning outcomes.
 
 ## Citation
 
 If you use this code in your research, please cite our paper:
 
 ```
-Zhang, W., Clackson, K., Georgieva, S., Santamaria, L., Reindl, V., Noreika, V., Darby, N., Valsdottir, V., Santhanakrishnan, P., & Leong, V. (2025). Adult-infant neural coupling mediates infants’ selection of socially-relevant stimuli for learning across cultures.
+Zhang, W., Clackson, K., Georgieva, S., Santamaria, L., Reindl, V., Noreika, V., Darby, N., Valsdottir, V., Santhanakrishnan, P., & Leong, V. (2025). Adult-to-Infant neural coupling mediates infants’ selection of socially-relevant stimuli for learning across cultures.
 ```
 
 ## Data Availability
