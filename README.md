@@ -2,9 +2,9 @@
 
 This repository contains the analysis code for the research paper:
 
-**Adult-to-Infant neural coupling mediates infants’ selection of socially-relevant stimuli for learning across cultures**
+**Adult-to-infant unidirectional neural coupling mediates selective social learning in British and Singaporean infants**
 
-Wei Zhang<sup>1,2</sup>, Kaili Clackson<sup>1</sup>, Stanimira Georgieva<sup>1</sup>, Lorena Santamaria<sup>1</sup>, Vanessa Reindl<sup>3,4</sup>, Valdas Noreika<sup>5</sup>, Nicholas Darby<sup>6</sup>, Vaka Valsdottir<sup>6</sup>, Priyadharshini Santhanakrishnan<sup>1</sup>, & Victoria Leong<sup>1,*</sup>
+Wei Zhang<sup>1,2</sup>, Kaili Clackson<sup>1</sup>, Stanimira Georgieva<sup>1</sup>, Lorena Santamaria<sup>1</sup>, Vanessa Reindl<sup>3,4</sup>, Valdas Noreika<sup>5</sup>, Nicholas Darby<sup>6</sup>, Vaka Valsdottir<sup>6</sup>, Priyadharshini Santhanakrishnan<sup>1</sup>, & Victoria Leong<sup>1,7,*</sup>
 
 <sup>1</sup> Early Mental Potential and Wellbeing Research (EMPOWER) Centre, Nanyang Technological University, Singapore
 <sup>2</sup> Cognitive Neuroimaging Centre, Nanyang Technological University, Singapore
@@ -12,6 +12,7 @@ Wei Zhang<sup>1,2</sup>, Kaili Clackson<sup>1</sup>, Stanimira Georgieva<sup>1</
 <sup>4</sup> Section Child Neuropsychology, Department of Child and Adolescent Psychiatry, Psychosomatics and Psychotherapy, Uniklinik RWTH Aachen, Germany
 <sup>5</sup> Department of Psychology, School of Biological and Chemical Sciences, Queen Mary University of London, London, UK
 <sup>6</sup> Department of Psychology, University of Cambridge, UK
+<sup>7</sup> Department of Pediatrics, University of Cambridge, UK
 
 ## Overview
 
@@ -22,7 +23,7 @@ This repository contains the analytical code used to investigate how Adult-to-In
 If you use this code in your research, please cite our paper:
 
 ```
-Zhang, W., Clackson, K., Georgieva, S., Santamaria, L., Reindl, V., Noreika, V., Darby, N., Valsdottir, V., Santhanakrishnan, P., & Leong, V. (2025). Adult-to-Infant neural coupling mediates infants’ selection of socially-relevant stimuli for learning across cultures.
+Zhang, W., Clackson, K., Georgieva, S., Santamaria, L., Reindl, V., Noreika, V., Darby, N., Valsdottir, V., Santhanakrishnan, P., & Leong, V. (2026). Adult-to-infant unidirectional neural coupling mediates selective social learning in British and Singaporean infants
 ```
 
 ## Data Availability
