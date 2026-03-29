@@ -4,15 +4,16 @@ This repository contains the analysis code for the research paper:
 
 **Adult-to-infant unidirectional neural coupling mediates selective social learning in British and Singaporean infants**
 
-Wei Zhang<sup>1,2</sup>, Kaili Clackson<sup>1</sup>, Stanimira Georgieva<sup>1</sup>, Lorena Santamaria<sup>1</sup>, Vanessa Reindl<sup>3,4</sup>, Valdas Noreika<sup>5</sup>, Nicholas Darby<sup>6</sup>, Vaka Valsdottir<sup>6</sup>, Priyadharshini Santhanakrishnan<sup>1</sup>, & Victoria Leong<sup>1,7,*</sup>
+Wei Zhang<sup>1,2</sup>, Kaili Clackson<sup>1</sup>, Stanimira Georgieva<sup>1</sup>, Lorena Santamaria<sup>1</sup>, Vanessa Reindl<sup>3,4,5</sup>, Valdas Noreika<sup>6</sup>, Nicholas Darby<sup>7</sup>, Vaka Valsdottir<sup>7</sup>, Priyadharshini Santhanakrishnan<sup>1</sup>, & Victoria Leong<sup>1,8,*</sup>
 
 <sup>1</sup> Early Mental Potential and Wellbeing Research (EMPOWER) Centre, Nanyang Technological University, Singapore
 <sup>2</sup> Cognitive Neuroimaging Centre, Nanyang Technological University, Singapore
 <sup>3</sup> Division of Psychology, Nanyang Technological University, Singapore
 <sup>4</sup> Section Child Neuropsychology, Department of Child and Adolescent Psychiatry, Psychosomatics and Psychotherapy, Uniklinik RWTH Aachen, Germany
-<sup>5</sup> Department of Psychology, School of Biological and Chemical Sciences, Queen Mary University of London, London, UK
-<sup>6</sup> Department of Psychology, University of Cambridge, UK
-<sup>7</sup> Department of Pediatrics, University of Cambridge, UK
+<sup>5</sup> Institute of Medical Psychology and Medical Sociology, Uniklinik RWTH Aachen, Germany
+<sup>6</sup> Department of Psychology, School of Biological and Chemical Sciences, Queen Mary University of London, London, UK
+<sup>7</sup> Department of Psychology, University of Cambridge, UK
+<sup>8</sup> Department of Pediatrics, University of Cambridge, UK
 
 ## Overview
 
