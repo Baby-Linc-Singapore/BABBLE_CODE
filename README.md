@@ -2,7 +2,7 @@
 
 This repository contains the analysis code for the research paper:
 
-**Adult-to-infant unidirectional neural coupling mediates selective social learning in British and Singaporean infants**
+**Adult-to-infant unidirectional neural coupling mediates selective social learning in infants from the UK and Singapore**
 
 Wei Zhang<sup>1,2</sup>, Kaili Clackson<sup>1</sup>, Stanimira Georgieva<sup>1</sup>, Lorena Santamaria<sup>1</sup>, Vanessa Reindl<sup>3,4,5</sup>, Valdas Noreika<sup>6</sup>, Nicholas Darby<sup>7</sup>, Vaka Valsdottir<sup>7</sup>, Priyadharshini Santhanakrishnan<sup>1</sup>, & Victoria Leong<sup>1,8,*</sup>
 
@@ -24,7 +24,7 @@ This repository contains the analytical code used to investigate how Adult-to-In
 If you use this code in your research, please cite our paper:
 
 ```
-Zhang, W., Clackson, K., Georgieva, S., Santamaria, L., Reindl, V., Noreika, V., Darby, N., Valsdottir, V., Santhanakrishnan, P., & Leong, V. (2026). Adult-to-infant unidirectional neural coupling mediates selective social learning in British and Singaporean infants
+Zhang, W., Clackson, K., Georgieva, S., Santamaria, L., Reindl, V., Noreika, V., Darby, N., Valsdottir, V., Santhanakrishnan, P., & Leong, V. (2026). Adult-to-infant unidirectional neural coupling mediates selective social learning in infants from the UK and Singapore
 ```
 
 ## Data Availability
