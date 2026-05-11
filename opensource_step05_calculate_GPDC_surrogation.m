@@ -5,12 +5,11 @@
 %
 % Purpose: Identify connections significantly stronger than surrogate baseline
 %
-% IMPORTANT: Non-Circular Feature Selection
+% Outcome-Independent Feature Selection
 % This step identifies significant connections by comparing real GPDC values
 % against surrogate (phase-randomized) GPDC values. The selection is based
-% SOLELY on whether connectivity is stronger than chance, WITHOUT using
-% learning outcome data. This ensures the feature selection is independent
-% of the outcome variable, preventing circular analysis.
+% on whether connectivity is stronger than chance; learning outcomes are
+% introduced only in later prediction models.
 %
 % Statistical approach:
 % 1. For each connection, compute mean GPDC across participants
@@ -22,8 +21,6 @@
 % - Ding et al. (2006). Granger causality: Basic theory and application to neuroscience
 % - Bastos & Schoffelen (2016). A tutorial review of functional connectivity analysis methods
 %
-% Based on: scripts_R1/fs5_strongpdc.m
-
 clear all;
 clc;
 
@@ -231,7 +228,7 @@ fprintf('=======================================================================
 fprintf('Feature Selection Method:\n');
 fprintf('  - Based on surrogate test (real > chance baseline)\n');
 fprintf('  - Independent of learning outcomes\n');
-fprintf('  - Non-circular by design\n\n');
+fprintf('  - Outcome-independent selection rule\n\n');
 
 fprintf('Files generated:\n');
 fprintf('  - stronglistfdr5_gpdc_II.mat\n');
@@ -246,8 +243,8 @@ fprintf('  - mean_real: Mean GPDC for each connection\n\n');
 
 fprintf('Next steps:\n');
 fprintf('  - Step 11: Use stronglist files for PLS regression\n');
-fprintf('  - These significant connections were selected WITHOUT using learning data\n');
-fprintf('  - This ensures non-circular feature selection for subsequent prediction\n\n');
+fprintf('  - Significant connections were selected from surrogate-based GPDC testing\n');
+fprintf('  - Learning outcomes are introduced in the subsequent prediction models\n\n');
 
 fprintf('========================================================================\n');
 fprintf('Script complete.\n');

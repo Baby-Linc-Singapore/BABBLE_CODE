@@ -5,7 +5,7 @@
 %
 % Purpose: Demonstrate MVAR model diagnostic checks for GPDC connectivity analysis
 %
-% This validation script addresses Reviewer Comment 2.6 regarding model adequacy.
+% This script reports MVAR model diagnostics for the GPDC analyses.
 % It demonstrates two critical model diagnostics:
 % 1. Variance Explained: How well the model captures signal variance
 % 2. Stability Analysis: Whether the model produces stable dynamics

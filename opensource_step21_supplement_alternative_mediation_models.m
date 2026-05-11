@@ -1,22 +1,18 @@
-%% Alternative Mediation Models: Negative Control Analyses
+%% Alternative Mediation Model Comparison
 % All datasets have been made publicly available through Nanyang Technological University (NTU)'s
 % data repository (DR-NTU Data https://researchdata.ntu.edu.sg/) and can be accessed according to
 % NTU's open access policy.
 %
-% Purpose: Test alternative mediators as negative controls
+% Purpose: Compare alternative candidate mediators with the main adult-to-infant pathway
 %
-% This script addresses Reviewer Comment 2.3 regarding mediation specificity.
-% While the main analysis showed AI GPDC mediates gaze effects on learning,
-% this script tests whether ALTERNATIVE mediators (II GPDC, NSE features) also
-% show mediation. If mediation were purely a statistical artifact, these
-% alternatives should also show significant effects. Their failure to mediate
-% validates specificity of the AI GPDC pathway.
+% This script tests whether alternative mediators (II GPDC, NSE features) show
+% the same mediation pattern as the adult-to-infant GPDC pathway.
 %
 % Key findings reported in manuscript (Supplementary Section 7):
-% - II GPDC (within-infant): No mediation (β = 0.06, p = .820)
-% - NSE features (5 variants): No mediation (all p > .15)
+% - II GPDC (within-infant): No statistically significant mediation (β = 0.06, p = .820)
+% - NSE features (5 variants): No statistically significant mediation (all p > .15)
 % - Only AI GPDC shows significant mediation (β = 0.52, p = .014)
-% - Specificity validates genuine neural pathway beyond statistical artifacts
+% - Pattern supports specificity of the adult-to-infant pathway
 %
 % References:
 % - Supplementary Materials Section 7: Alternative mediation models
@@ -29,7 +25,7 @@ clear all
 clc
 
 fprintf('========================================================================\n');
-fprintf('Alternative Mediation Models: Negative Control Analyses\n');
+fprintf('Alternative Mediation Model Comparison\n');
 fprintf('========================================================================\n\n');
 
 % Set base path (modify as needed)
@@ -49,16 +45,14 @@ fprintf('  Subjects: %d\n', n_subjects);
 fprintf('  Observations: %d (block-level)\n', n_obs_total);
 fprintf('  Bootstrap iterations: %d\n\n', n_bootstrap);
 
-%% Part 1: II GPDC Mediation (Negative Control)
+%% Part 1: II GPDC Mediation
 
 fprintf('========================================================================\n');
-fprintf('PART 1: II GPDC Mediation Analysis (Negative Control)\n');
+fprintf('PART 1: II GPDC Mediation Analysis\n');
 fprintf('========================================================================\n\n');
 
-fprintf('Rationale: Test whether within-infant connectivity shows same mediation\n');
-fprintf('pattern as adult-infant connectivity. If mediation is artifact of\n');
-fprintf('PLS optimization, II GPDC should also mediate despite being\n');
-fprintf('optimized identically.\n\n');
+fprintf('Rationale: Compare whether within-infant connectivity shows a comparable\n');
+fprintf('mediation pattern to adult-to-infant connectivity.\n\n');
 
 %% Load Data
 
@@ -192,10 +186,10 @@ fprintf('  Direct effect (c''): β = %.2f\n', direct_mean_II);
 fprintf('    95%% CI [%.2f, %.2f], p = %.3f\n\n', direct_CI_II(1), direct_CI_II(2), p_direct_II);
 
 if p_indirect_II >= 0.05
-    fprintf('✓ Negative control confirmed: II GPDC does NOT mediate gaze effects.\n');
-    fprintf('  This validates specificity of AI GPDC pathway.\n\n');
+    fprintf('Alternative mediator summary: no statistically significant II GPDC mediation detected.\n');
+    fprintf('  This supports specificity of the AI GPDC pathway.\n\n');
 else
-    fprintf('✗ Unexpected: II GPDC shows mediation effect.\n\n');
+    fprintf('Flag: II GPDC showed statistically significant mediation in this run.\n\n');
 end
 
 %% Part 2: NSE Mediation Models (Multiple Features)
@@ -248,6 +242,7 @@ fprintf('Each feature: %d × 1 (ITC values by block)\n\n', n_obs_total);
 % Load NSE data (user must provide)
 % load(NSE_file, 'NSE_Delta_C3', 'NSE_Theta_F4', 'NSE_Theta_Pz', ...
 %      'NSE_Alpha_C3', 'NSE_Alpha_Cz');
+% NSE_matrix = [NSE_Delta_C3, NSE_Theta_F4, NSE_Theta_Pz, NSE_Alpha_C3, NSE_Alpha_Cz];
 
 fprintf('Note: Please load NSE data from step08-10 outputs.\n\n');
 
@@ -256,9 +251,8 @@ for feat_idx = 1:n_NSE
 
     feat_name = NSE_features(feat_idx).name;
 
-    % Extract corresponding NSE feature from loaded data
-    % NSE_feature = NSE_featurename;  % e.g., NSE_Delta_C3
-    % For demonstration, skip actual mediation computation
+    % Extract corresponding NSE feature from the loaded feature matrix
+    NSE_feature = NSE_matrix(:, feat_idx);
 
     % Mediation model
     X_a_NSE = [gaze_full, age, sex, country, ones(n_obs_total, 1)];
@@ -294,7 +288,7 @@ for feat_idx = 1:n_NSE
         indirect_mean_NSE, p_indirect_NSE);
 end
 
-fprintf('\n✓ Negative control confirmed: No NSE features mediate gaze effects (all p > .15).\n');
+fprintf('\nAlternative mediator summary: No NSE features mediate gaze effects (all p > .15).\n');
 fprintf('  Only Delta C3 shows gaze modulation (Path a), but no learning prediction (Path b).\n\n');
 
 %% Part 3: Summary Table (Supplementary Table S3)
@@ -387,7 +381,7 @@ try
         end
     end
 
-    sgtitle('Alternative Mediation Models: Negative Controls');
+    sgtitle('Alternative Mediation Model Comparison');
 
     fprintf('Visualization generated successfully.\n\n');
 catch
@@ -397,17 +391,14 @@ end
 %% Summary and Manuscript Reporting
 
 fprintf('========================================================================\n');
-fprintf('Negative Control Validation Summary\n');
+fprintf('Alternative Mediator Comparison Summary\n');
 fprintf('========================================================================\n\n');
 
 fprintf('OBJECTIVE:\n');
-fprintf('  Test alternative mediators as negative controls to validate\n');
-fprintf('  specificity of AI GPDC mediation pathway.\n\n');
+fprintf('  Compare alternative mediators with the AI GPDC mediation pathway.\n\n');
 
 fprintf('RATIONALE:\n');
-fprintf('  If mediation is purely a statistical artifact of PLS optimization,\n');
-fprintf('  then II GPDC (optimized identically) should also show mediation.\n');
-fprintf('  Failure of II GPDC and NSE to mediate validates genuine specificity.\n\n');
+fprintf('  Lack of comparable mediation in II GPDC and NSE supports pathway specificity.\n\n');
 
 fprintf('METHODS:\n');
 fprintf('  1. II GPDC mediation: Test Gaze → II Component → Learning\n');
@@ -419,38 +410,36 @@ fprintf('KEY FINDINGS:\n\n');
 fprintf('Main Result (AI GPDC):\n');
 fprintf('  Indirect effect: β = 0.52, p = .014 *\n\n');
 
-fprintf('Negative Control 1 (II GPDC):\n');
+fprintf('Alternative mediator 1 (II GPDC):\n');
 fprintf('  Indirect effect: β = %.2f, 95%% CI [%.2f, %.2f], p = %.3f\n', ...
     indirect_mean_II, indirect_CI_II(1), indirect_CI_II(2), p_indirect_II);
-fprintf('  Result: No mediation (p = %.3f > .05)\n\n', p_indirect_II);
+fprintf('  Result: no statistically significant mediation detected (p = %.3f > .05)\n\n', p_indirect_II);
 
-fprintf('Negative Control 2 (NSE Features):\n');
+fprintf('Alternative mediator 2 (NSE Features):\n');
 for feat_idx = 1:n_NSE
     fprintf('  %s: β = %.2f, p = %.3f\n', ...
         NSE_mediation_results(feat_idx).feature, ...
         NSE_mediation_results(feat_idx).indirect, ...
         NSE_mediation_results(feat_idx).p_indirect);
 end
-fprintf('  Result: No features mediate (all p > .15)\n\n');
+fprintf('  Result: no NSE feature showed statistically significant mediation (all p > .15)\n\n');
 
 fprintf('INTERPRETATION:\n');
-fprintf('  Despite identical PLS optimization procedures, only AI GPDC shows\n');
-fprintf('  significant mediation. This pattern cannot be explained by circular\n');
-fprintf('  optimization artifacts, which would affect all PLS-derived mediators\n');
-fprintf('  equally. The specificity validates genuine neural pathway.\n\n');
+fprintf('  In these comparison models, the reported mediation pattern was specific\n');
+fprintf('  to the adult-to-infant GPDC pathway.\n\n');
 
 fprintf('CONVERGENCE:\n');
 fprintf('  Combined with condition-based validation (step18: Fz→F4 identified\n');
-fprintf('  independently of learning), these negative controls strengthen\n');
-fprintf('  confidence that mediation reflects true biological mechanism.\n\n');
+fprintf('  independently of learning), these comparison models strengthen\n');
+fprintf('  confidence in the adult-to-infant mediation pattern.\n\n');
 
 fprintf('Manuscript Reporting (Supplementary Section 7):\n');
-fprintf('  "Negative control analyses confirmed mediation specificity. Despite\n');
-fprintf('   identical PLS optimization, II GPDC showed no mediation (β = %.2f,\n', ...
+fprintf('  "Alternative mediator analyses supported mediation specificity. II GPDC\n');
+fprintf('   showed no statistically significant mediation (β = %.2f,\n', ...
     indirect_mean_II);
 fprintf('   p = %.3f), nor did any of five NSE features (all p > .15). Only\n', p_indirect_II);
 fprintf('   AI GPDC demonstrated significant mediation (β = 0.52, p = .014),\n');
-fprintf('   validating pathway specificity beyond optimization artifacts.\n');
+fprintf('   supporting pathway specificity.\n');
 fprintf('   (Supplementary Table S3, Fig S6)."\n\n');
 
 fprintf('========================================================================\n');

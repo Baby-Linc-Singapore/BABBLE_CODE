@@ -4,17 +4,17 @@
 % NTU's open access policy.
 %
 % Purpose: Analyze the relationship between different types of neural connectivity
-% (adult-infant and infant-infant) and learning outcomes in infants using PLS regression
+% (adult-to-infant and within-infant) and learning outcomes in infants using PLS regression
 %
 % This script analyzes:
-% 1. How adult-infant (AI) and infant-infant (II) GPDC connectivity predict learning outcomes
+% 1. How adult-to-infant (AI) and within-infant (II) GPDC connectivity predict learning outcomes
 % 2. How neural connectivity patterns predict infant CDI gesture scores
 % 3. Validation through surrogate testing, cross-validation, and bootstrap resampling
 % 4. Visualization of PLS component loadings and connectivity patterns
 %
 % Model validation (see Methods Section 4.3.5):
 % - Surrogate testing: Real connectivity R² vs. null distribution from shuffled data
-% - Cross-validation: Leave-one-out procedure for generalization assessment
+% - Cross-validation: 10-fold procedure for generalization assessment
 % - Bootstrap CI: 1000 iterations for component loading stability
 
 %% Initialize environment
@@ -42,11 +42,11 @@ fprintf('Data loaded successfully. Processing %d participants.\n', size(data, 1)
 ii_alpha = [10+81*2:9+81*3];    % Infant-infant alpha band connectivity (columns 172-252)
 ai_alpha = [10+81*8:9+81*9];    % Adult-infant alpha band connectivity (columns 658-738)
 
-%% Load Significant Connections (NON-CIRCULAR FEATURE SELECTION)
+%% Load Significant Connections (OUTCOME-INDEPENDENT FEATURE SELECTION)
 %
 % IMPORTANT: These connections were selected based on surrogate testing
 % (real > chance baseline) in Step 5, NOT based on correlation with learning.
-% This ensures non-circular feature selection for subsequent prediction analysis.
+% Learning outcomes are introduced only in the PLS prediction analysis below.
 %
 % Feature selection method (from Step 5):
 % 1. For each connection, compute mean GPDC across all observations
@@ -55,14 +55,8 @@ ai_alpha = [10+81*8:9+81*9];    % Adult-infant alpha band connectivity (columns 
 % 4. Apply FDR correction (Benjamini-Hochberg)
 % 5. Select connections with pFDR < 0.05
 %
-% This approach:
-% - Uses ONLY connectivity strength (real > chance)
-% - Does NOT use learning outcome data for selection
-% - Prevents circular analysis (double-dipping)
-%
-% References:
-% - Kriegeskorte et al. (2009). Circular analysis in systems neuroscience
-% - Vul et al. (2009). Puzzlingly high correlations in fMRI studies
+% This approach uses connectivity strength relative to the surrogate baseline
+% as the feature-screening step before the learning-prediction model.
 
 fprintf('Loading significant connectivity patterns from Step 5...\n');
 
@@ -80,10 +74,9 @@ listai = listi(s4);
 ai = sqrt(data(:,listai));  % Extract and transform AI connectivity values
 fprintf('  AI alpha: %d significant connections (surrogate-selected)\n', length(listai));
 
-fprintf('\nFeature selection confirmed as non-circular:\n');
+fprintf('\nFeature-selection inputs loaded:\n');
 fprintf('  - Selection criterion: Real > surrogate baseline\n');
-fprintf('  - Learning data NOT used in Step 5\n');
-fprintf('  - Prevents inflated prediction accuracy\n\n');
+fprintf('  - Learning outcomes are used in the PLS prediction step\n\n');
 
 %% Prepare surrogate data for statistical comparison
 

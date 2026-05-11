@@ -5,7 +5,7 @@
 %
 % Purpose: Validate mediation findings across multiple frequency bands
 %
-% This validation script addresses Reviewer Comment 2.6 regarding robustness of
+% This script evaluates robustness of
 % findings across frequency specifications. While the main analysis focused on
 % infant alpha band (6-9 Hz), this script validates the Gaze → AI connectivity → Learning
 % pathway across three frequency bands: Delta (1-3 Hz), Theta (3-6 Hz), and Alpha (6-9 Hz).

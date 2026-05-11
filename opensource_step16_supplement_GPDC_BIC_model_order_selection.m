@@ -5,7 +5,7 @@
 %
 % Purpose: Demonstrate MVAR model order selection using BIC minimization
 %
-% This validation script addresses Reviewer Comment 2.6 regarding MVAR model diagnostics.
+% This script summarizes BIC-based MVAR model-order checks.
 % It demonstrates the procedure used to determine optimal model order (MO = 7)
 % for GPDC connectivity analysis.
 %

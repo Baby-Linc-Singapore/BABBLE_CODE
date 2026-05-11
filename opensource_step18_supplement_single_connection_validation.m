@@ -1,15 +1,13 @@
-%% Single-Connection Validation: Non-Circular Feature Selection for Mediation Analysis
+%% Single-Connection Validation: Outcome-Independent Feature Selection for Mediation Analysis
 % All datasets have been made publicly available through Nanyang Technological University (NTU)'s
 % data repository (DR-NTU Data https://researchdata.ntu.edu.sg/) and can be accessed according to
 % NTU's open access policy.
 %
-% Purpose: Validate mediation findings using independently-identified single connection
+% Purpose: Follow up mediation findings using an independently identified single connection
 %
-% This validation script addresses Reviewer Comment 2.3 regarding potential circularity
-% in mediation analysis. While the main analysis used PLS-derived components optimized
-% for learning prediction (introducing analytical dependencies), this script validates
-% findings using a connection identified SOLELY through gaze condition differences,
-% with NO reference to learning outcomes.
+% This validation script follows up the network-level mediation result using
+% a single adult-to-infant connection identified from gaze-condition differences
+% rather than from learning prediction.
 %
 % Key findings reported in manuscript (Supplementary Section 4):
 % - Only one AI connection (adult Fz → infant F4) shows gaze modulation (pFDR = .048)
@@ -17,7 +15,7 @@
 %   * Indirect effect: β = 0.08, p = .038
 %   * Direct effect: β = -0.21, p = .138
 % - Captures ~15% of full network effect (β = 0.08 vs β = 0.52)
-% - Convergence validates genuine neural pathway beyond statistical artifacts
+% - Convergence supports the specificity of the adult-to-infant pathway
 %
 % References:
 % - Leong et al. (2017). Speaker gaze increases information coupling. PNAS.
@@ -29,7 +27,7 @@ clear all
 clc
 
 fprintf('========================================================================\n');
-fprintf('Single-Connection Validation: Non-Circular Feature Selection\n');
+fprintf('Single-Connection Validation: Outcome-Independent Feature Selection\n');
 fprintf('========================================================================\n\n');
 
 % Set base path (modify as needed)
@@ -385,8 +383,8 @@ fprintf('  Both approaches (PLS-optimized network AND condition-selected connect
 fprintf('  converge on the same mediation structure:\n');
 fprintf('    - Significant indirect effects through AI connectivity\n');
 fprintf('    - Non-significant direct effects of gaze\n');
-fprintf('  This convergence validates that mediation reflects genuine neural\n');
-fprintf('  pathways rather than statistical artifacts from optimization.\n\n');
+fprintf('  This convergence supports the adult-to-infant mediation pattern\n');
+fprintf('  beyond the PLS-derived network summary.\n\n');
 
 %% Visualization (Optional)
 
@@ -447,7 +445,7 @@ fprintf('Validation Summary\n');
 fprintf('========================================================================\n\n');
 
 fprintf('OBJECTIVE:\n');
-fprintf('  Validate mediation findings using non-circular feature selection.\n\n');
+fprintf('  Follow up mediation findings using feature selection independent of learning.\n\n');
 
 fprintf('METHOD:\n');
 fprintf('  1. Test all 81 AI connections for gaze modulation (NO learning data used)\n');
@@ -463,13 +461,13 @@ fprintf('    Direct effect: β = %.2f, 95%% CI [%.2f, %.2f], p = %.3f\n', ...
 fprintf('  Single connection captures ~%.0f%% of network effect\n\n', proportion_captured);
 
 fprintf('CONVERGENCE:\n');
-fprintf('  PLS-optimized network: β = %.2f (exploratory, circular)\n', network_indirect);
-fprintf('  Condition-selected Fz→F4: β = %.2f (confirmatory, non-circular)\n', single_conn_indirect);
+fprintf('  PLS-derived network: β = %.2f\n', network_indirect);
+fprintf('  Condition-selected Fz→F4: β = %.2f\n', single_conn_indirect);
 fprintf('  Both show same pattern: significant indirect, non-significant direct\n\n');
 
 fprintf('CONCLUSION:\n');
-fprintf('  Mediation structure replicates across independent analytical approaches,\n');
-fprintf('  validating genuine neural pathway beyond statistical artifacts.\n\n');
+fprintf('  Mediation structure is consistent across complementary analytical approaches,\n');
+fprintf('  supporting the specificity of the adult-to-infant pathway.\n\n');
 
 fprintf('========================================================================\n');
 fprintf('Script complete.\n');

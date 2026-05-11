@@ -54,14 +54,8 @@ participant_list = [
 ];
 
 % Participant count verification
-% Expected: 47 participants with behavioral data, 42 with valid EEG
-n_eeg_valid = length(participant_list);  % Should be 42
+n_eeg_valid = length(participant_list);  % EEG analysis sample
 fprintf('Participants with valid EEG: %d\n', n_eeg_valid);
-
-% List of excluded participant IDs (no valid EEG data)
-excluded_ids = [1113, 1136, 1112, 1116, 2112, 2118, 2119];  % 7 excluded
-n_excluded = length(excluded_ids);
-fprintf('Participants excluded from EEG: %d\n', n_excluded);
 
 %% Extract behavioral variables
 
@@ -94,8 +88,8 @@ for i = 1:size(behavioral_data, 1)
         % Get participant ID
         p_id = behavioral_data(i, 2);
         
-        % Skip excluded participants
-        if ~ismember(p_id, excluded_ids)
+        % Retain EEG-valid participants
+        if ismember(p_id, participant_list)
             % Extract 3-digit participant number
             p_num = num2str(p_id);
             p_num = p_num(2:4);
@@ -286,8 +280,8 @@ for surr_idx = 1:1000
             if ~isnan(a(i, 7))
                 p_id = a(i, 2);
                 
-                % Skip excluded participants
-                if ~ismember(p_id, excluded_ids)
+                % Retain EEG-valid participants
+                if ismember(p_id, participant_list)
                     % Extract 3-digit participant number
                     p_num = num2str(a(i, 2));
                     p_num = p_num(2:4);

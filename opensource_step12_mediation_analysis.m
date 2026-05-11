@@ -16,7 +16,7 @@
 %
 % TWO-TIER VALIDATION STRATEGY:
 %
-% 1. Negative Control (Within-Infant Connectivity):
+% 1. Alternative mediator comparison (Within-Infant Connectivity):
 %    - Infant-infant (II) GPDC subjected to identical PLS optimization
 %    - Should NOT mediate if effect is specific to adult-infant pathway
 %    - Result: No significant mediation (see Supplementary Section 7)
@@ -41,7 +41,7 @@
 % - Requires future experimental manipulation for causal claims
 %
 % REFERENCES:
-% - Reviewer Comment 2.3: Mediation circularity concerns
+% - Supplementary mediation robustness checks
 % - Supplementary Section 4.3.5: Validation analyses
 % - Methods Section 4.5: Statistical analysis framework
 %

@@ -5,7 +5,7 @@
 %
 % Purpose: Validate absence of order/carryover effects in repeated-measures design
 %
-% This script addresses Reviewer Comment 3.2 regarding potential interference
+% This script evaluates potential interference
 % between successive grammar exposures. Infants learned three different artificial
 % languages in three gaze conditions, with counterbalanced presentation orders.
 % This analysis demonstrates that learning performance was not systematically
